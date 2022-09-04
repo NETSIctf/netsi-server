@@ -1,9 +1,10 @@
+import "./scss/main.scss"
+
 function App() {
 
   return (
-    <div>
+    <div className="white-text">
       NETSI BASIC SERVER
-      Test
     </div>
   )
 }

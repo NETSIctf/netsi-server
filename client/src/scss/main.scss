@@ -1,0 +1,15 @@
+@import "../../node_modules/bootstrap/scss/functions";
+
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
+
+$body-bg: rgb(19, 21, 22);
+$text-color: rgb(255, 255, 255);
+
+body {
+    background-color: $body-bg;
+}
+
+p, h1, h2, h3, h4, h5, h6, .white-text {
+    color: $text-color;
+}
