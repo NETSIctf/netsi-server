@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "compile-scss": "sass src/css/main.scss src/css/main.css",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
