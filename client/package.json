@@ -15,17 +15,13 @@
     "react-bootstrap": "^2.5.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
-    "sass": "^1.54.8"
+    "sass": "^1.54.8",
+    "bootstrap": "^5.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.1",
-<<<<<<< HEAD
-=======
-    "bootstrap": "^5.2.0",
-    "sass": "^1.54.8",
->>>>>>> 77e9a6cce4e8b67a04b388d3e339b328a9eeb3af
     "typescript": "^4.6.4",
     "vite": "^3.0.7"
   }
