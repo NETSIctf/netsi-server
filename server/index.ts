@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
 import * as dotenv from "dotenv";
-import { strict } from "assert";
+import http from "http";
+import https from "https";
+import fs from "fs";
 
 dotenv.config();
 const app = express();
@@ -58,6 +60,17 @@ app.get("/", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
 })
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
+if (process.env.NODE_ENV == "production") {
+
+    const options = {
+        key: fs.readFileSync('/etc/letsencrypt/live/netsi.tk/privkey.pem'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/netsi.tk/fullchain.pem')
+    };
+
+    http.createServer(app).listen(80);
+    https.createServer(options, app).listen(443);
+} else {
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+}
