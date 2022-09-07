@@ -20,6 +20,14 @@ const __dirname = path.dirname(__filename);
 app.use(bodyParser.json());
 
 // WEBHOOK POSTING
+
+/**
+ * Sends an embed to the webhook
+ * 
+ * @arg title Title of embed
+ * @arg description Description of embed
+ * @arg color https://www.spycolor.com/
+ */
 function webhookMessage(title: String, description: String, color: number) {
     const data = {
         embeds: [{
@@ -90,3 +98,14 @@ if (process.env.NODE_ENV == "production") {
         console.log(`Server listening on port ${PORT}`);
     });
 }
+
+process.on('uncaughtException', function (err) {
+    console.error(err.stack);
+    
+    var errorMessage = err.stack + ""
+    if (!err.stack) {
+        errorMessage = "No error stack found... weird."
+    }
+
+    webhookMessage("Server Error!", errorMessage, 16711680)
+});
