@@ -20,11 +20,11 @@ const __dirname = path.dirname(__filename);
 app.use(bodyParser.json());
 
 // WEBHOOK POSTING
-function webhookMessage(title: String, content: String, color: number) {
+function webhookMessage(title: String, description: String, color: number) {
     const data = {
         embeds: [{
             title: title,
-            content: content,
+            description: description,
             color: color
         }]
     }
