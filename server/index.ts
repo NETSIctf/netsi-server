@@ -8,6 +8,7 @@ import * as dotenv from "dotenv";
 import http from "http";
 import https from "https";
 import fs from "fs";
+import axios from "axios"
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,20 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(bodyParser.json());
+
+// WEBHOOK POSTING
+function webhookMessage(content?: String, embeds?: Array<JSON>) {
+    if (content == null || embeds == null) {
+        throw new Error("Invalid arguments, missing either content or embeds.")
+    }
+
+    const data = {
+        content: content,
+        embeds: embeds
+    }
+
+    axios.post("https://canary.discord.com/api/webhooks/1016905904093925406/hQpKUm3elqbBKw7XIipjcODkVtwshuOiDfbORhGNIUUe9OwTRpqCp24Pv5UI0NVU9Giv", data)
+}
 
 // API ROUTES
 const apis = express.Router();
