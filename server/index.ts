@@ -20,17 +20,16 @@ const __dirname = path.dirname(__filename);
 app.use(bodyParser.json());
 
 // WEBHOOK POSTING
-function webhookMessage(content?: String, embeds?: Array<JSON>) {
-    if (content == null || embeds == null) {
-        throw new Error("Invalid arguments, missing either content or embeds.")
-    }
-
+function webhookMessage(title: String, content: String, color: number) {
     const data = {
-        content: content,
-        embeds: embeds
+        embeds: [{
+            title: title,
+            content: content,
+            color: color
+        }]
     }
 
-    axios.post("https://canary.discord.com/api/webhooks/1016905904093925406/hQpKUm3elqbBKw7XIipjcODkVtwshuOiDfbORhGNIUUe9OwTRpqCp24Pv5UI0NVU9Giv", data)
+    axios.post("https://discord.com/api/webhooks/1016905904093925406/hQpKUm3elqbBKw7XIipjcODkVtwshuOiDfbORhGNIUUe9OwTRpqCp24Pv5UI0NVU9Giv", data)
 }
 
 // API ROUTES
@@ -84,6 +83,8 @@ if (process.env.NODE_ENV == "production") {
 
     http.createServer(app).listen(80);
     https.createServer(options, app).listen(443);
+
+    webhookMessage("Server is online", "Server is online, listening at `netsi.tk`!", 65280)
 } else {
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
