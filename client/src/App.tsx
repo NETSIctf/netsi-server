@@ -1,7 +1,19 @@
-import { Form, Button } from "react-bootstrap"
-import "./scss/main.scss"
+import { useState } from "react";
+import { Form, Button } from "react-bootstrap";
+import axios from "axios";
+import "./scss/main.scss";
 
 function App() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  function login() {
+    axios.post("/api/login", {username: username, password: password})
+      .then(resolve => {
+      }).catch(reject => {
+        console.error(reject);
+      })
+  }
 
   return (
     <div>
@@ -12,13 +24,13 @@ function App() {
           <h2>Login:</h2>
         </div>
         <div className={`mt-2`} >
-          <Form.Control type="text" placeholder="Username" />
+          <Form.Control type="text" placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
         </div>
         <div className={`mt-2`} >
-          <Form.Control type="password" placeholder="Password" />
+          <Form.Control type="password" placeholder="Password" value={password} onChange={event => setPassword(event.target.value)} />
         </div>
         <div className={`mt-2`} >
-          <Button variant="primary" >Login</Button>
+          <Button variant="primary" onClick={() => login()} >Login</Button>
         </div>
       </div>
     </div>
