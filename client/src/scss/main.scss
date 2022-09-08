@@ -12,12 +12,9 @@ $text-color: $light;
 
 body, html, #root {
     background-color: $body-bg;
+    color: $text-color;
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-}
-
-p, h1, h2, h3, h4, h5, h6, .white-text {
-    color: $text-color;
 }
