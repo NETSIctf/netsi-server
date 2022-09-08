@@ -13,13 +13,18 @@ function App() {
   function login() {
     axios.post("/api/login", { username: username, password: password })
       .then(resolve => {
-        if (resolve.status == 401) {
+        if (resolve.status == 401) { // probably not needed
           setLoginFail(true);
         } else {
           navigate("/webshell");
         }
       }).catch(reject => {
-        console.error(reject);
+        if (reject.response.data == "bad auth") {
+          setLoginFail(true);
+        }
+        else {
+          console.error(reject);
+        }
       })
   }
 
