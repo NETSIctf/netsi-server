@@ -16,7 +16,7 @@ export default function Webshell() {
 
     return (
         <div>
-            waoww webshell
+            waow webshell
         </div>
     )
 }
