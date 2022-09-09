@@ -90,6 +90,9 @@ let monData: { data: string, headers: http.IncomingHttpHeaders }[] = [];
 apis.all("/monitor", (req, res) => {
     let req2str = `${req.method} ${req.path} Cookies: ${JSON.stringify(req.cookies)} Body: ${JSON.stringify(req.body)}`;
     monData.push({ data: req2str, headers: req.headers });
+
+    res.status(200);
+    res.end("request logged");
 })
 
 apis.get("/login", (req, res) => {
