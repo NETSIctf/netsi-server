@@ -96,6 +96,11 @@ apis.get("/login", (req, res) => {
     }
 })
 
+apis.get("/status", (req, res) => {
+    res.status(200);
+    res.end("G");
+});
+
 
 app.use("/api", apis);
 
