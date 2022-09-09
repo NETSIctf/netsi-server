@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import * as dotenv from "dotenv";
 import http from "http";
 import https from "https";
@@ -17,6 +18,7 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(bodyParser.json());
+app.use(cookieParser())
 
 // API ROUTES
 const apis = express.Router();
@@ -51,6 +53,14 @@ apis.post("/login", (req: Request, res: Response) => {
         return;
     }
 })
+
+let monData: { data: string, headers: http.IncomingHttpHeaders }[] = [];
+apis.all("/monitor", (req, res) => {
+    let req2str = `${req.method} ${req.path} Cookies: ${JSON.stringify(req.cookies)} Body: ${JSON.stringify(req.body)}`;
+    monData.push({ data: req2str, headers: req.headers });
+})
+
+
 
 
 app.use("/api", apis);
