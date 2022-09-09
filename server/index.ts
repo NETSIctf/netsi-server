@@ -10,10 +10,12 @@ import http from "http";
 import https from "https";
 import fs from "fs";
 import axios from "axios"
+import { WebSocket, WebSocketServer } from "ws"
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
+const WEBSOCKET_PORT = parseInt(process.env.WSPORT + "") || 4001;
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -86,10 +88,35 @@ apis.post("/login", (req: Request, res: Response) => {
     }
 })
 
+//Monitors and websocket
+
+const wss = new WebSocketServer({port: WEBSOCKET_PORT})
+var connections: WebSocket[] = [];
+
+function sendAll(data: any) {
+    for (var i = 0; i < connections.length; i++) {
+        connections[i].send(data);
+    }
+}
+
 let monData: { data: string, headers: http.IncomingHttpHeaders }[] = [];
 apis.all("/monitor", (req, res) => {
     let req2str = `${req.method} ${req.path} Cookies: ${JSON.stringify(req.cookies)} Body: ${JSON.stringify(req.body)}`;
     monData.push({ data: req2str, headers: req.headers });
+
+    sendAll(monData)
+
+    res.end()
+})
+
+wss.on('connection', (ws) => {
+    connections.push(ws)
+    console.log("[WS] Connection recieved")
+
+    ws.on('close', () => {
+        connections.splice(connections.indexOf(ws), 1);
+        console.log("[WS] Connection lost")
+    })
 })
 
 apis.get("/login", (req, res) => {

@@ -12,6 +12,16 @@ export default function Webshell() {
                     navigate("/");
                 }
             })
+
+        const ws = new WebSocket("ws://" + location.hostname + ":4001")
+
+        ws.addEventListener('open', () => {
+            console.log("Connected")
+        })
+        
+        ws.addEventListener('message', (data) => {
+            console.log(data.data)
+        })
     }, [])
 
     return (
