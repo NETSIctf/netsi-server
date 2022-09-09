@@ -104,7 +104,7 @@ apis.all("/monitor", (req, res) => {
     let req2str = `${req.method} ${req.path} Cookies: ${JSON.stringify(req.cookies)} Body: ${JSON.stringify(req.body)}`;
     monData.push({ data: req2str, headers: req.headers });
 
-    sendAll(monData)
+    sendAll(req2str)
 
     res.end()
 })
