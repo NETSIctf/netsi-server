@@ -9,6 +9,7 @@ import * as dotenv from "dotenv";
 import http from "http";
 import https from "https";
 import fs from "fs";
+import axios from "axios"
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,37 @@ const __dirname = path.dirname(__filename);
 
 app.use(bodyParser.json());
 app.use(cookieParser())
+
+// WEBHOOK POSTING
+
+/**
+ * Sends an embed to the webhook
+ * 
+ * @arg title Title of embed
+ * @arg description Description of embed
+ * @arg color https://www.spycolor.com/
+ */
+function webhookMessage(title: String, description: String, color: number) {
+    const data = {
+        embeds: [{
+            title: title,
+            description: description,
+            color: color
+        }]
+    }
+
+    axios.post("https://discord.com/api/webhooks/1016905904093925406/hQpKUm3elqbBKw7XIipjcODkVtwshuOiDfbORhGNIUUe9OwTRpqCp24Pv5UI0NVU9Giv", data)
+}
+
+function verifyLogin(token: string | undefined) {
+    try {
+        if (token && jwt.verify(token, process.env.jwt_secret + "", { algorithms: ["HS256"] })) {
+            return true;
+        }
+    } catch(err) {
+        return false;
+    }
+}
 
 // API ROUTES
 const apis = express.Router();
@@ -60,13 +92,28 @@ apis.all("/monitor", (req, res) => {
     monData.push({ data: req2str, headers: req.headers });
 })
 
+apis.get("/login", (req, res) => {
+    if (verifyLogin(req.cookies.token)) {
+        res.status(200);
+        res.end("success");
+        return;
+    } else {
+        res.status(401);
+        res.end("bad auth");
+        return;
+    }
+})
 
+apis.get("/status", (req, res) => {
+    res.status(200);
+    res.end("pong");
+});
 
 
 app.use("/api", apis);
 
 app.use("/assets", express.static("../client/dist/assets/"));
-app.get("/", (req: Request, res: Response) => {
+app.get("*", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
 })
 
@@ -79,8 +126,21 @@ if (process.env.NODE_ENV == "production") {
 
     http.createServer(app).listen(80);
     https.createServer(options, app).listen(443);
+
+    webhookMessage("Server is online", "Server is online, listening at `netsi.tk`!", 65280)
 } else {
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
     });
 }
+
+process.on('uncaughtException', function (err) {
+    console.error(err.stack);
+
+    var errorMessage = err.stack + ""
+    if (!err.stack) {
+        errorMessage = "No error stack found... weird."
+    }
+
+    webhookMessage("Server Error!", errorMessage, 16711680)
+});
