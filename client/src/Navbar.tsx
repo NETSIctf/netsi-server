@@ -15,7 +15,6 @@ function Navbar() {
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
               <a className="navbar-brand" href="/">NETSI</a>
-
               <div className="collapse navbar-collapse">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
