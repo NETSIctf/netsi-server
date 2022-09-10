@@ -4,13 +4,7 @@ import axios from "axios";
 export default function Logout() {
     const navigate = useNavigate();
 
-    axios.get('/api/logout').then(() => {
+    axios.get('/api/logout').catch().finally(() => {
         navigate('/login');
     })
-
-    return (
-        <div>
-            Logging out...
-        </div>
-    )
 }
