@@ -29,6 +29,7 @@ function Login() {
       })
   }
 
+  console.log(sessionStorage.getItem("token"));
   axios.get("/api/login").then(resolve => {
     if (resolve.status === 200) {
         navigate("/");
