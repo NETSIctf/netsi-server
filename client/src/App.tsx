@@ -4,12 +4,12 @@ import axios from "axios";
 import "./scss/main.scss";
 import { useNavigate } from "react-router-dom";
 import checkLogin from "./checkLogin";
+import Navbar from "./Navbar";
 
 function App() {
   const navigate = useNavigate();
 
   checkLogin();
-
   return (
     <div>
       wow main page

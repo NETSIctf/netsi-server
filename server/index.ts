@@ -104,6 +104,13 @@ apis.get("/login", (req, res) => {
     }
 })
 
+apis.get("/logout", (req, res) => {
+    res.status(200);
+    res.clearCookie("token");
+    res.end("success");
+    return;
+})
+
 apis.get("/status", (req, res) => {
     res.status(200);
     res.end("pong");
