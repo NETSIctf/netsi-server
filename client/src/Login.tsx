@@ -11,7 +11,6 @@ function Login() {
   const navigate = useNavigate();
 
   function login() {
-    console.log(sessionStorage.getItem("token"));
     axios.post("/api/login", { username: username, password: password })
       .then(resolve => {
         if (resolve.status == 401) { // probably not needed
@@ -29,7 +28,6 @@ function Login() {
       })
   }
 
-  console.log(sessionStorage.getItem("token"));
   axios.get("/api/login").then(resolve => {
     if (resolve.status === 200) {
         navigate("/");
