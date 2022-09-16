@@ -1,12 +1,14 @@
-import axios from "axios"
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import checkLogin from "./checkLogin";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { checkLogin } from "./components/LoginChecks";
+import "./scss/main.scss";
 
 export default function Webshell() {
     const navigate = useNavigate();
 
-    checkLogin();
+    useEffect(() => { // runs on first render
+        checkLogin();
+    }, [])
 
     return (
         <div>

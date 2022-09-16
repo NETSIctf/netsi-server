@@ -5,7 +5,7 @@ import App from './App'
 import Webshell from './Webshell'
 import NoPage from './NoPage'
 import Login from './Login'
-import Navbar from './Navbar'
+import Navbar from './components/Navbar'
 import Logout from './Logout'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

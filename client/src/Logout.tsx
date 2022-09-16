@@ -7,4 +7,6 @@ export default function Logout() {
     axios.get('/api/logout').then(() => {
         navigate('/login');
     })
+
+    return null;
 }
