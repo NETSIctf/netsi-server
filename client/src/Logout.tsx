@@ -8,5 +8,7 @@ export default function Logout() {
         navigate('/login');
     })
 
-    return null;
+    return <div>
+        Logging you out...
+    </div>;
 }
