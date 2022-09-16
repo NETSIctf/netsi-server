@@ -16,9 +16,8 @@
     "react-bootstrap": "^2.5.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
-    "sass": "^1.54.8",
-    "xterm": "^5.0.0",
-    "xterm-for-react": "^1.0.4"
+    "react-terminal-ui": "^1.0.0",
+    "sass": "^1.54.8"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",

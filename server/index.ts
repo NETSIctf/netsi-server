@@ -9,7 +9,7 @@ import * as dotenv from "dotenv";
 import http from "http";
 import https from "https";
 import fs from "fs";
-import axios from "axios"
+import webhookMessage from "./utils/webhookMessage";
 
 dotenv.config();
 const app = express();
@@ -20,27 +20,6 @@ const __dirname = path.dirname(__filename);
 
 app.use(bodyParser.json());
 app.use(cookieParser())
-
-// WEBHOOK POSTING
-
-/**
- * Sends an embed to the webhook
- * 
- * @arg title Title of embed
- * @arg description Description of embed
- * @arg color https://www.spycolor.com/
- */
-function webhookMessage(title: String, description: String, color: number) {
-    const data = {
-        embeds: [{
-            title: title,
-            description: description,
-            color: color
-        }]
-    }
-
-    axios.post("https://discord.com/api/webhooks/1016905904093925406/hQpKUm3elqbBKw7XIipjcODkVtwshuOiDfbORhGNIUUe9OwTRpqCp24Pv5UI0NVU9Giv", data)
-}
 
 function verifyLogin(token: string | undefined) {
     try {
