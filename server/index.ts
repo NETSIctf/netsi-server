@@ -7,7 +7,8 @@ dotenv.config();
 import http from "http";
 import https from "https";
 import fs from "fs";
-import webhookMessage from "./utils/webhookMessage";
+import webhookMessage from "./utils/webhookMessage.js";
+import sqlite3 from "sqlite3";
 
 import apis from "./api";
 
@@ -15,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 app.use("/api", apis);
 
@@ -39,6 +40,8 @@ if (process.env.NODE_ENV == "production") {
         console.log(`Server listening on port ${PORT}`);
     });
 }
+
+
 
 process.on('uncaughtException', function (err) {
     console.error(err.stack);
