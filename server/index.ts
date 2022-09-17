@@ -8,7 +8,6 @@ import http from "http";
 import https from "https";
 import fs from "fs";
 import webhookMessage from "./utils/webhookMessage.js";
-import sqlite3 from "sqlite3";
 
 import apis from "./api";
 
