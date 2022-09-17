@@ -10,6 +10,7 @@ import http from "http";
 import https from "https";
 import fs from "fs";
 import webhookMessage from "./utils/webhookMessage";
+import sqlite3 from "sqlite3";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,24 @@ const PORT = process.env.PORT || 4000;
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const db = new sqlite3.Database(".db", (err) => {
+    if (err) {
+        console.error(err.message);
+    }
+    console.log("Connected to the database.");
+});
+
+// create ctfs table if it doesn't exist
+db.run(`CREATE TABLE IF NOT EXISTS ctfs( 
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL)`, (err) => {
+    if (err) {
+        console.error(err.message);
+    }
+    console.log("Created ctfs table.");
+});
 
 app.use(bodyParser.json());
 app.use(cookieParser())
@@ -98,6 +117,33 @@ apis.get("/status", (req, res) => {
     res.end("pong");
 });
 
+apis.post("/ctfs/add", (req, res) => {
+    // adds a new ctf
+    if (verifyLogin(req.cookies.token)) {
+        db.run("INSERT INTO ctfs (name, description) VALUES (?, ?)", [req.body.name, req.body.description], function(err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    res.status(409);
+                    res.end("ctf already exists");
+                    return;
+                }
+                console.error(err);
+                res.status(500);
+                res.end("server error");
+                return;
+            }
+            res.status(200);
+            res.end("success");
+            return;
+        })
+    }
+    else {
+        res.status(401);
+        res.end("bad auth");
+        return;
+    }
+})
+
 
 app.use("/api", apis);
 
@@ -122,6 +168,8 @@ if (process.env.NODE_ENV == "production") {
         console.log(`Server listening on port ${PORT}`);
     });
 }
+
+
 
 process.on('uncaughtException', function (err) {
     console.error(err.stack);

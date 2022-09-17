@@ -1,6 +1,10 @@
 node_modules
-.env
 dist
 yarn-error.log
 pidfile
 logfile.log
+
+# databases and env
+*.db
+*.sqlite
+*.env
