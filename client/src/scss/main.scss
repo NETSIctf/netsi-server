@@ -4,11 +4,15 @@
 @import "../../node_modules/bootstrap/scss/maps";
 @import "../../node_modules/bootstrap/scss/mixins";
 @import "../../node_modules/bootstrap/scss/utilities";
+@import "../../node_modules/bootstrap/scss/list-group";
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
 $body-bg: rgb(19, 21, 22);
 $text-color: $light;
+
+$primary: rgb(33, 37, 41);
+$secondary: $body-bg;
 
 body, html, #root {
     background-color: $body-bg;
@@ -25,4 +29,14 @@ body, html, #root {
 
 .react-terminal-wrapper {
     padding: 45px !important;
+}
+
+.dark-list-group-item {
+    background-color: $primary;
+    color: $light;
+}
+
+.dark-list-group-item:hover {
+    background-color: $secondary;
+    color: $light;
 }

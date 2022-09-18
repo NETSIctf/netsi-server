@@ -64,5 +64,22 @@ export default function apis(socketManager: WSocket) {
         }
     })
 
+    router.get("/ctfs/list", (req, res) => {
+        // lists all ctfs
+        if (verifyLogin(req.cookies.token)) {
+            db.all("SELECT name FROM ctfs", [], (err, rows) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                res.status(200);
+                res.json(rows);
+                return;
+            })
+        }
+    })
+
     return router;
 }
