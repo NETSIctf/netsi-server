@@ -22,6 +22,7 @@ function CtfList() {
         <div className={`mt-2`} >
           <h2>CTF:</h2>
         </div>
+        <a href="/ctf/add" className="btn btn-primary mb-2">Add CTF</a>
         <div className={`list-group`} >
           {ctfs.map((ctf, index) => {
             return (
