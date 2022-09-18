@@ -6,17 +6,16 @@ import { useState, useEffect } from "react";
 function CtfList() {
   checkLoginNavigate();
 
-  let [ctfs, setCtfs] = useState([]);
+  let [ctfs, setCtfs] = useState<any[]>([]);
 
   useEffect(() => {
     axios.get("/api/ctfs/list").then(result => {
       setCtfs(result.data);
     }).catch(reject => {
       console.log(reject);
+      setCtfs([]);
     })
   }, [])
-
-  console.log(ctfs);
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center">
