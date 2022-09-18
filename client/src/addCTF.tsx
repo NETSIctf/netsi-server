@@ -37,13 +37,13 @@ function AddCTF() {
   checkLoginNavigate();
   return (
     <div>
-      <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
-          {error}
-          <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
-      </div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
         <div className={`mt-2`} >
             <h2>AddCTF:</h2>
+          </div>
+          <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
+            {error}
+            <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
           </div>
           <div className={`mt-2`} >
             <Form.Control type="text" placeholder="Title" value={title} onChange={event => SetCTFTitle(event.target.value)} />
