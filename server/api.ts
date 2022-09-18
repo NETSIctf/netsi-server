@@ -40,6 +40,13 @@ export default function apis(socketManager: WSocket) {
     router.post("/ctfs/add", (req, res) => {
         // adds a new ctf
         if (verifyLogin(req.cookies.token)) {
+            // prevent spaces or slashes in ctf name
+            if (req.body.name.includes(" ") || req.body.name.includes("/")) {
+                res.status(400);
+                res.end("Invalid name");
+                return;
+            }
+
             db.run("INSERT INTO ctfs (name, description) VALUES (?, ?)", [req.body.name, req.body.description], function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
