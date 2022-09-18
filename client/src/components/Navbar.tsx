@@ -1,9 +1,6 @@
 import "../scss/main.scss";
-import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const navigate = useNavigate();
-
   let login = <a className="navbar-brand" href="/logout">Logout</a>;
 
   if (window.location.pathname === "/login") {
@@ -17,9 +14,8 @@ function Navbar() {
               <a className="navbar-brand" href="/">NETSI</a>
               <div className="collapse navbar-collapse">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li className="nav-item">
-                    <a className="nav-link" href="/webshell">Webshell</a>
-                  </li>
+                  <a className="nav-link" href="/webshell">Webshell</a>
+                  <a className="nav-link" href="/ctfs">CTFs</a>
                 </ul>
               </div>
 

@@ -8,6 +8,7 @@ import Login from './Login'
 import Navbar from './components/Navbar'
 import Logout from './Logout'
 import AddCTF from './addCTF'
+import CtfList from './CtfList'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="ctf/add" element={<AddCTF />} />
+        <Route path="ctfs" element={<CtfList />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
