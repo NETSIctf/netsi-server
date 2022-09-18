@@ -4,11 +4,10 @@ import http from "node:http";
 export type messageListener = { message: string, handler: (msg: string, socket: Socket) => void }
 
 export default class WSocket {
-    #io: Server;
+    #io: Server = new Server();
     #message: messageListener[] = [];
 
-    constructor(server: http.Server) {
-        this.#io = new Server(server);
+    constructor() {
         this.#io.on("connection", this.#onConnection);
     }
 
@@ -18,11 +17,15 @@ export default class WSocket {
         })
     }
 
-    addMessage(listener: messageListener) {
-        this.#message.push(listener);
+    addMessage(message: messageListener["message"], handler: messageListener["handler"]) {
+        this.#message.push({ message: message, handler: handler });
     }
 
     emit(event: string, ...args: any[]) {
         this.#io.emit(event, ...args);
+    }
+
+    attach(server: http.Server) {
+        this.#io.attach(server);
     }
 }
