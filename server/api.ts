@@ -40,8 +40,8 @@ export default function apis(socketManager: WSocket) {
     router.post("/ctfs/add", (req, res) => {
         // adds a new ctf
         if (verifyLogin(req.cookies.token)) {
-            // prevent spaces or slashes in ctf name
-            if (req.body.name.includes(" ") || req.body.name.includes("/")) {
+            // prevent spaces, slashes, or is empty in ctf name
+            if (req.body.name.includes(" ") || req.body.name.includes("/") || req.body.name == "") {
                 res.status(400);
                 res.end("Invalid name");
                 return;

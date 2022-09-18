@@ -29,7 +29,7 @@ function AddCTF() {
       }
       else if (reject.response.data == "Invalid name") {
         console.log("Invalid name");
-        setError("Invalid name");
+        setError("Invalid name. Names cannot contain spaces, slashes, or be empty.");
       }
     })
   }
