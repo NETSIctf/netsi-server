@@ -3,6 +3,7 @@ dist
 yarn-error.log
 pidfile
 logfile.log
+.vscode
 
 # databases and env
 *.db
