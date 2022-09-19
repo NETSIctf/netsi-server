@@ -88,5 +88,32 @@ export default function apis(socketManager: WSocket) {
         }
     })
 
+    router.get("/ctf/:name", (req, res) => {
+        // gets info about a ctf
+        if (verifyLogin(req.cookies.token)) {
+            db.get("SELECT * FROM ctfs WHERE name = ?", [req.params.name], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                if (row == undefined) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+                res.status(200);
+                res.json(row);
+                return;
+            })
+        }
+        else {
+            res.status(401);
+            res.end("bad auth");
+            return;
+        }
+    })
+
     return router;
 }
