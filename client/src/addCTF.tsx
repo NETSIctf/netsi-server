@@ -39,7 +39,7 @@ function AddCTF() {
     <div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
         <div className={`mt-2`} >
-            <h2>AddCTF:</h2>
+            <h2>Add CTF:</h2>
           </div>
           <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
             {error}
