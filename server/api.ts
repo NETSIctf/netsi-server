@@ -115,5 +115,27 @@ export default function apis(socketManager: WSocket) {
         }
     })
 
+    router.post("/ctfs/delete/:name", (req, res) => {
+        // deletes a ctf
+        if (verifyLogin(req.cookies.token)) {
+            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                res.status(200);
+                res.end("success");
+                return;
+            })
+        }
+        else {
+            res.status(401);
+            res.end("bad auth");
+            return;
+        }
+    })
+
     return router;
 }
