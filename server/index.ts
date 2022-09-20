@@ -1,3 +1,9 @@
+const oldLog = console.log.bind(console);
+
+console.log = (message?: any, ...optionalParams: any[]) => {
+    oldLog(`[${new Date().toUTCString()}]`, message, ...optionalParams);
+}
+
 import path from "path";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
@@ -17,6 +23,8 @@ const socketManager = new WSocket();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+
 
 // Request Body/Cookies
 app.use(bodyParser.json());
