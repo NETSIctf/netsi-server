@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 function AddCTF() {
   let navigate = useNavigate();
 
-  const [duplicateFail, setDuplicateFail] = useState(false);
+  const [error, setError] = useState("");
   const [title, SetCTFTitle] = useState("");
   const [description, SetCTFDescription] = useState("");
   
@@ -25,7 +25,11 @@ function AddCTF() {
       console.error(reject);
       if (reject.response.data == "ctf already exists") {
         console.log("ctf already exists");
-        setDuplicateFail(true);
+        setError("CTF already exists");
+      }
+      else if (reject.response.data == "Invalid name") {
+        console.log("Invalid name");
+        setError("Invalid name. Names cannot contain spaces, slashes, or be empty.");
       }
     })
   }
@@ -33,13 +37,13 @@ function AddCTF() {
   checkLoginNavigate();
   return (
     <div>
-      <div className={`alert alert-danger alert-dismissible fade rounded d-${duplicateFail ? "block show" : "none"}`} role="alert" >
-          CTF already exists
-          <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setDuplicateFail(false)} />
-      </div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
         <div className={`mt-2`} >
-            <h2>AddCTF:</h2>
+            <h2>Add CTF:</h2>
+          </div>
+          <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
+            {error}
+            <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
           </div>
           <div className={`mt-2`} >
             <Form.Control type="text" placeholder="Title" value={title} onChange={event => SetCTFTitle(event.target.value)} />

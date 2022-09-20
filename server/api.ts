@@ -40,6 +40,13 @@ export default function apis(socketManager: WSocket) {
     router.post("/ctfs/add", (req, res) => {
         // adds a new ctf
         if (verifyLogin(req.cookies.token)) {
+            // prevent spaces, slashes, or is empty in ctf name
+            if (req.body.name.includes(" ") || req.body.name.includes("/") || req.body.name == "") {
+                res.status(400);
+                res.end("Invalid name");
+                return;
+            }
+
             db.run("INSERT INTO ctfs (name, description) VALUES (?, ?)", [req.body.name, req.body.description], function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
@@ -78,6 +85,55 @@ export default function apis(socketManager: WSocket) {
                 res.json(rows);
                 return;
             })
+        }
+    })
+
+    router.get("/ctf/:name", (req, res) => {
+        // gets info about a ctf
+        if (verifyLogin(req.cookies.token)) {
+            db.get("SELECT * FROM ctfs WHERE name = ?", [req.params.name], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                if (row == undefined) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+                res.status(200);
+                res.json(row);
+                return;
+            })
+        }
+        else {
+            res.status(401);
+            res.end("bad auth");
+            return;
+        }
+    })
+
+    router.post("/ctfs/delete/:name", (req, res) => {
+        // deletes a ctf
+        if (verifyLogin(req.cookies.token)) {
+            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                res.status(200);
+                res.end("success");
+                return;
+            })
+        }
+        else {
+            res.status(401);
+            res.end("bad auth");
+            return;
         }
     })
 
