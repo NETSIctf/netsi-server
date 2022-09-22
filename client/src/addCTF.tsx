@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 function AddCTF() {
   let navigate = useNavigate();
+  checkLoginNavigate();
 
   const [error, setError] = useState("");
   const [title, SetCTFTitle] = useState("");
@@ -34,7 +35,7 @@ function AddCTF() {
     })
   }
 
-  checkLoginNavigate();
+  
   return (
     <div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>

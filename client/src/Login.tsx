@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 import "./scss/main.scss";
 import { useNavigate } from "react-router-dom";
+import { checkLoginNavigate } from "./components/LoginChecks";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginFail, setLoginFail] = useState(false);
   const navigate = useNavigate();
+
+  checkLoginNavigate()
 
   function login() {
     axios.post("/api/login", { username: username, password: password })
@@ -27,13 +30,6 @@ function Login() {
         }
       })
   }
-
-  axios.get("/api/login").then(resolve => {
-    if (resolve.status === 200) {
-        navigate("/");
-    }
-  }).catch()
-
 
   return (
     <div>
