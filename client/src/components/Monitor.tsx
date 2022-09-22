@@ -15,6 +15,8 @@ export default function Monitor() {
     useEffect(() => { // SOCKET INIT CODE
         socket.connect();
 
+        console.log(socket);
+
         setTermData((arr) => [...arr, <TerminalOutput key={arr.length} >Connecting to server WebSocket...</TerminalOutput>]);
 
         socket.on("connect", () => {
