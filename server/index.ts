@@ -24,11 +24,17 @@ const socketManager = new WSocket();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-
-
 // Request Body/Cookies
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use((request, response, next) => {
+    if (process.env.NODE_ENV == "production" && !request.secure) {
+        return response.redirect("https://" + request.headers.host + request.url);
+    }
+
+    next();
+})
 
 // routes
 app.use("/api", apis(socketManager)); // ALL apis
@@ -46,8 +52,8 @@ if (process.env.NODE_ENV == "production") {
         cert: fs.readFileSync('/etc/letsencrypt/live/netsi.tk/fullchain.pem')
     };
 
-    let server = http.createServer(app).listen(80);
-    https.createServer(options, app).listen(443);
+    http.createServer(app).listen(80);
+    let server = https.createServer(options, app).listen(443);
 
     socketManager.attach(server);
 
