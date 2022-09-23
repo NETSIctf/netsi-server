@@ -7,7 +7,7 @@ function App() {
   return (
     <div>
       <h1> NETSI MAIN PAGE </h1>
-      I like fish.
+      Fish is objectively bad.
     </div>
   )
 }
