@@ -6,7 +6,8 @@ function App() {
   
   return (
     <div>
-      wow main page
+      <h1> NETSI MAIN PAGE </h1>
+      I like fish.
     </div>
   )
 }

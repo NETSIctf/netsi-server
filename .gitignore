@@ -4,6 +4,7 @@ yarn-error.log
 pidfile
 logfile.log
 .vscode
+package-lock.json
 
 # databases and env
 *.db

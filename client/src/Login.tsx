@@ -35,9 +35,9 @@ function Login() {
     <div>
       <h1 className="text-center">NETSI</h1>
 
-      <div className={`d-flex flex-column justify-content-center align-items-center`} >
+      <div className={`d-flex flex-column justify-content-center align-items-center`} onKeyDown={e => e.key == "Enter" ? login() : null} >
         <div className={`bg-danger p-2 rounded d-${loginFail ? "block" : "none"}`} >
-          Bad Username or Password
+          Nobody expected that your username or password could be wrong, but it is.
         </div>
 
         <div className={`mt-2`} >

@@ -17,7 +17,7 @@ export default function Monitor() {
 
         console.log(socket);
 
-        setTermData((arr) => [...arr, <TerminalOutput key={arr.length} >Connecting to server WebSocket...</TerminalOutput>]);
+        setTermData((arr) => [...arr, <TerminalOutput key={arr.length} >Connecting to socket...</TerminalOutput>]);
 
         socket.on("connect", () => {
             setTermData((arr) => [...arr, <TerminalOutput key={arr.length} >Connected</TerminalOutput>]);
