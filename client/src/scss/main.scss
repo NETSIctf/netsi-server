@@ -23,6 +23,11 @@ body, html, #root {
     height: 100%;
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
 .react-terminal-wrapper::before {
     content: unset !important;
 }

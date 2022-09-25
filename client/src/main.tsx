@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <Navbar />
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="webshell" element={<Webshell />} />
+        <Route path="webshell/*" element={<Webshell />} />
         <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="ctf/add" element={<AddCTF />} />

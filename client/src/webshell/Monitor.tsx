@@ -25,7 +25,7 @@ export default function Monitor() {
     }
 
     function setOptions(options: Partial<monDataOptions>) {
-        setOptions_nomerge(prev => ({...prev, ...options}));
+        setOptions_nomerge(prev => ({ ...prev, ...options }));
     }
 
     useEffect(() => { // SOCKET INIT CODE
@@ -103,14 +103,13 @@ showheaders - true/false - Shows the header field or not.
                 appendTermData(`Unknown Command: ${args[0]}`);
         }
     }
-
     function cmdOptionSet(args: string[]) {
         switch (args[0]) {
             case "showheaders":
                 if (args[1] == "true") {
-                    setOptions({showHeaders: true});
+                    setOptions({ showHeaders: true });
                 } else if (args[1] == "false") {
-                    setOptions({showHeaders: false});
+                    setOptions({ showHeaders: false });
                 } else {
                     appendTermData(`Recieved Invalid Input for showheaders: ${args[1]}`);
                     break;
@@ -123,7 +122,7 @@ showheaders - true/false - Shows the header field or not.
     }
 
     return (
-        <div>
+        <div className="h-100" >
             <Terminal colorMode={ColorMode.Dark} prompt={`$`} onInput={(text) => commands(text)} >
                 {termData}
             </Terminal>
