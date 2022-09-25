@@ -57,11 +57,11 @@ export default function Add() {
           </div>
           Start Date:
           <div className={`mt-2`} >
-            <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} showTimeSelect />
+            <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
           </div>
           End Date:
           <div className={`mt-2`} >
-            <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} showTimeSelect />
+            <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
           </div>
           <div className={`mt-2`} >
             <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
