@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/react-datepicker": "^4.4.2",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
