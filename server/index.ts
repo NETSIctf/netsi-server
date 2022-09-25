@@ -28,10 +28,16 @@ const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use((request, response, next) => {
+app.use((request, response, next) => { // Upgrade to secure
     if (process.env.NODE_ENV == "production" && !request.secure) {
         return response.redirect("https://" + request.headers.host + request.url);
     }
+
+    next();
+})
+
+app.use((request, response, next) => {
+    console.log(`${request.method} ${request.path} / IP ${request.ip} User-Agent ${request.headers["user-agent"]}`);
 
     next();
 })
@@ -74,5 +80,5 @@ process.on('uncaughtException', function (err) {
         errorMessage = "No error stack found... weird."
     }
 
-    webhookMessage("Server Error!", errorMessage, 16711680)
+    webhookMessage("Server Error!", errorMessage, 16711680);
 });
