@@ -7,9 +7,7 @@ import NoPage from './NoPage'
 import Login from './Login'
 import Navbar from './components/Navbar'
 import Logout from './Logout'
-import AddCTF from './ctfs/Add'
-import CtfList from './ctfs/List'
-import ViewCTF from './ctfs/View'
+import CTFs from "./ctfs/Index";
 
 import "./scss/main.scss";
 
@@ -22,9 +20,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Route path="webshell/*" element={<Webshell />} />
         <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
-        <Route path="ctf/add" element={<AddCTF />} />
-        <Route path="ctfs" element={<CtfList />} />
-        <Route path="ctfs/*" element={<ViewCTF />} />
+        <Route path="ctfs/*" element={<CTFs />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>

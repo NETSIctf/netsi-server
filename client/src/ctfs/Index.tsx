@@ -8,7 +8,7 @@ export default function Index() {
         <Routes>
             <Route index element={<List />} />
             <Route path="add" element={<Add />} />
-            <Route path=":id" element={<View />} />
+            <Route path=":ctfId" element={<View />} />
         </Routes>
     )
 }

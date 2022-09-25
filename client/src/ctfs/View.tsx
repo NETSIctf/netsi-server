@@ -2,14 +2,23 @@ import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
+type ctfData = {
+  
+}
 
 export default function View() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  const [ctf, setCtf] = useState<any>();
+  const [error, setError] = useState(false);
+
   checkLoginNavigate();
 
   // get the ctf name from the url
-  let ctfName = window.location.pathname.split("/")[2];
+  const ctfName = params.ctfId;
 
   function deleteCTF() {
     // deletes a CTF from the database
@@ -25,9 +34,6 @@ export default function View() {
       alert("Error deleting CTF\n" + reject);
     })
   }
-
-  let [ctf, setCtf] = useState<any>({});
-  let [error, setError] = useState(false);
 
   useEffect(() => {
     axios.get(`/api/ctf/${ctfName}`).then(result => {
@@ -48,7 +54,7 @@ export default function View() {
         <p>{ctf.description}</p>
         <p>{ctf.start}</p>
         <p>{ctf.end}</p>
-        <button onClick={ deleteCTF } className="btn btn-danger">Delete CTF</button>
+        <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
       </div>
     )
   }

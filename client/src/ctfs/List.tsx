@@ -22,7 +22,7 @@ export default function List() {
         <div className={`mt-2`} >
           <h2>CTFs:</h2>
         </div>
-        <Link to="/ctf/add" className="btn btn-primary mb-2" >Add CTF</Link>
+        <Link to="/ctfs/add" className="btn btn-primary mb-2" >Add CTF</Link>
         <div className={`list-group`} >
           {ctfs.map((ctf, index) => {
             return (

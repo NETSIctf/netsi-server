@@ -6,6 +6,8 @@ logfile.log
 .vscode
 package-lock.json
 
+*.log
+
 # databases and env
 *.db
 *.sqlite
