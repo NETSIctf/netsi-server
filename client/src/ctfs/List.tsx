@@ -22,11 +22,11 @@ export default function List() {
         <div className={`mt-2`} >
           <h2>CTFs:</h2>
         </div>
-        <Link to="/ctfs/add" className="btn btn-primary mb-2" >Add CTF</Link>
+        <Link to="/ctf/add" className="btn btn-primary mb-2" >Add CTF</Link>
         <div className={`list-group`} >
           {ctfs.map((ctf, index) => {
             return (
-              <a href={`/ctfs/${ctf.name}`} className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >{ctf.name}</a>
+              <Link to={`/ctfs/${ctf.name}`} className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >{ctf.name}</Link>
             )
           })}
         </div>
