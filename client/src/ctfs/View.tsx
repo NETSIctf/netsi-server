@@ -1,11 +1,10 @@
-import { checkLoginNavigate } from "./components/LoginChecks";
-import "./scss/main.scss";
+import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios"
 import { useState, useEffect } from "react";
-import NoPage from './NoPage'
+import NoPage from '../NoPage'
 import { useNavigate } from "react-router-dom";
 
-function ViewCTF() {
+export default function View() {
   let navigate = useNavigate();
   checkLoginNavigate();
 
@@ -58,5 +57,3 @@ function ViewCTF() {
   }
 
 }
-
-export default ViewCTF

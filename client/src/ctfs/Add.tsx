@@ -1,11 +1,10 @@
-import { checkLoginNavigate } from "./components/LoginChecks";
-import "./scss/main.scss";
+import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios";
 import { useState } from "react";
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 
-function AddCTF() {
+export default function Add() {
   let navigate = useNavigate();
   checkLoginNavigate();
 
@@ -59,5 +58,3 @@ function AddCTF() {
     </div>
   )
 }
-
-export default AddCTF

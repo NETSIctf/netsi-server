@@ -1,9 +1,9 @@
-import { checkLoginNavigate } from "./components/LoginChecks";
-import "./scss/main.scss";
+import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios"
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-function CtfList() {
+export default function List() {
   checkLoginNavigate();
 
   let [ctfs, setCtfs] = useState<any[]>([]);
@@ -22,7 +22,7 @@ function CtfList() {
         <div className={`mt-2`} >
           <h2>CTFs:</h2>
         </div>
-        <a href="/ctf/add" className="btn btn-primary mb-2">Add CTF</a>
+        <Link to="/ctfs/add" className="btn btn-primary mb-2" >Add CTF</Link>
         <div className={`list-group`} >
           {ctfs.map((ctf, index) => {
             return (
@@ -33,5 +33,3 @@ function CtfList() {
     </div>
   )
 }
-
-export default CtfList

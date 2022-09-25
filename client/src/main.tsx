@@ -7,9 +7,11 @@ import NoPage from './NoPage'
 import Login from './Login'
 import Navbar from './components/Navbar'
 import Logout from './Logout'
-import AddCTF from './addCTF'
-import CtfList from './CtfList'
-import ViewCTF from './ViewCTF'
+import AddCTF from './ctfs/Add'
+import CtfList from './ctfs/List'
+import ViewCTF from './ctfs/View'
+
+import "./scss/main.scss";
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
