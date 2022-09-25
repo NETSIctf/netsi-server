@@ -23,7 +23,6 @@ export default class WSocket {
 
     addMessage(message: messageListener["message"], handler: messageListener["handler"]) {
         this.message.push({ message: message, handler: (...all) => handler(...all) });
-        console.log(this.message);
     }
 
     emit(event: string, ...args: any[]) {
