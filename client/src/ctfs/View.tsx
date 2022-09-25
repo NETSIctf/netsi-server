@@ -1,19 +1,22 @@
 import { checkLoginNavigate } from "../components/LoginChecks";
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useParams } from "react-router-dom";
 
 type ctfData = {
-  
+  name: string,
+  description: string,
+  start: string,
+  end: string
 }
 
 export default function View() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [ctf, setCtf] = useState<any>();
-  const [error, setError] = useState(false);
+  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "" });
+  const [status, setStatus] = useState<number>(200);
 
   checkLoginNavigate();
 
@@ -36,32 +39,31 @@ export default function View() {
   }
 
   useEffect(() => {
-    axios.get(`/api/ctf/${ctfName}`).then(result => {
+    axios.get(`/api/ctfs/${ctfName}`).then(result => {
+      setStatus(result.status);
       setCtf(result.data);
-    }).catch(reject => {
-      setError(true);
+    }).catch((reject: AxiosError) => {
+      setStatus(reject.response?.status || 500);
     })
   }, [])
 
-  if (ctf.description == "") {
-    ctf.description = <i>No description</i>;
-  }
-
-  if (!error) {
-    return (
-      <div className="d-flex flex-column justify-content-center align-items-center mt-2">
-        <h1>{ctf.name}</h1>
-        <p>{ctf.description}</p>
-        <p>{ctf.start}</p>
-        <p>{ctf.end}</p>
-        <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
+  switch (status) {
+    case 200:
+      return (
+        <div className="d-flex flex-column justify-content-center align-items-center mt-2">
+          <h1>{ctf.name}</h1>
+          <p>{ctf.description}</p>
+          <p>{ctf.start}</p>
+          <p>{ctf.end}</p>
+          <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
+        </div>
+      )
+    case 404:
+      return <NoPage />
+    case 500:
+      return <div>
+        Code 500 Internal Server Error
       </div>
-    )
-  }
-  else {
-    return (
-      <NoPage />
-    )
   }
 
 }
