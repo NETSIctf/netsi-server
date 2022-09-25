@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Nav from "react-bootstrap/Nav";
 import BsNavbar from "react-bootstrap/Navbar";
-import "../scss/main.scss";
 
 function Navbar() {
   const [login, setLogin] = useState(<Link className="navbar-brand" to="/logout">Logout</Link>);
