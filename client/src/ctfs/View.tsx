@@ -58,8 +58,8 @@ export default function View() {
         <div className="d-flex flex-column justify-content-center align-items-center mt-2">
           <h1>{ctf.name}</h1>
           <p>{ctf.description}</p>
-          <p>{ctf.start}</p>
-          <p>{ctf.end}</p>
+          <p>Start: {ctf.start}</p>
+          <p>End: {ctf.end}</p>
           <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
         </div>
       )
