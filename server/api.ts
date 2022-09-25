@@ -29,7 +29,9 @@ export default function apis(socketManager: WSocket) {
     db.run(`CREATE TABLE IF NOT EXISTS ctfs( 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    description TEXT NOT NULL)`, (err) => {
+    description TEXT NOT NULL,
+    start DATE NOT NULL,
+    end DATE NOT NULL)`, (err) => {
         if (err) {
             console.error(err.message);
         }
@@ -47,7 +49,7 @@ export default function apis(socketManager: WSocket) {
                 return;
             }
 
-            db.run("INSERT INTO ctfs (name, description) VALUES (?, ?)", [req.body.name, req.body.description], function (err) {
+            db.run("INSERT INTO ctfs (name, description, start, end) VALUES (?, ?, ?, ?)", [req.body.name, req.body.description, req.body.start, req.body.end], function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
                         res.status(409);

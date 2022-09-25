@@ -4,6 +4,9 @@ import axios from "axios";
 import { useState } from "react";
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 function AddCTF() {
   let navigate = useNavigate();
@@ -12,10 +15,12 @@ function AddCTF() {
   const [error, setError] = useState("");
   const [title, SetCTFTitle] = useState("");
   const [description, SetCTFDescription] = useState("");
+  const [start, SetCTFStart] = useState(new Date());
+  const [end, SetCTFEnd] = useState(new Date());
   
   function addCTF() {
     // adds a CTF to the database
-    axios.post("/api/ctfs/add", { name: title, description: description}).then(resolve => {
+    axios.post("/api/ctfs/add", { name: title, description: description, start: start, end: end}).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
@@ -35,7 +40,6 @@ function AddCTF() {
     })
   }
 
-  
   return (
     <div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
@@ -51,6 +55,14 @@ function AddCTF() {
           </div>
           <div className={`mt-2`} >
             <Form.Control as="textarea" placeholder="Description" value={description} onChange={event => SetCTFDescription(event.target.value)} />
+          </div>
+          Start Date:
+          <div className={`mt-2`} >
+            <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} showTimeSelect />
+          </div>
+          End Date:
+          <div className={`mt-2`} >
+            <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} showTimeSelect />
           </div>
           <div className={`mt-2`} >
             <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
