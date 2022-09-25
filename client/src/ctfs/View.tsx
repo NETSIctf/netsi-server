@@ -64,6 +64,10 @@ export default function View() {
       return <div>
         Code 500 Internal Server Error
       </div>
+    default:
+      return <div>
+        Code {status}
+      </div>
   }
 
 }
