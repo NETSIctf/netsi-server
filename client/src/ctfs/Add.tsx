@@ -5,7 +5,7 @@ import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 
-import "react-datepicker/dist/react-datepicker.css";
+import "../scss/datepicker.scss";
 
 export default function Add() {
   let navigate = useNavigate();
