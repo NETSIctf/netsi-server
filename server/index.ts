@@ -12,7 +12,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import http from "http";
 import https from "https";
-import fs from "fs";
+import fs from "node:fs";
+import morgan from "morgan";
 import webhookMessage from "./utils/webhookMessage.js";
 import WSocket from "./utils/WSocket.js";
 
@@ -36,11 +37,7 @@ app.use((request, response, next) => { // Upgrade to secure
     next();
 })
 
-app.use((request, response, next) => {
-    console.log(`${request.method} ${request.path} / IP ${request.ip} User-Agent ${request.headers["user-agent"]}`);
-
-    next();
-})
+app.use(morgan("combined"));
 
 // routes
 app.use("/api", apis(socketManager)); // ALL apis
