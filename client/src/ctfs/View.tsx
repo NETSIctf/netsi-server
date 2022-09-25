@@ -41,6 +41,11 @@ export default function View() {
   useEffect(() => {
     axios.get(`/api/ctfs/${ctfName}`).then(result => {
       setStatus(result.status);
+
+      // properly display the date
+      result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
+      result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
+
       setCtf(result.data);
     }).catch((reject: AxiosError) => {
       setStatus(reject.response?.status || 500);
