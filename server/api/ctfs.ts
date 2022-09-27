@@ -20,7 +20,7 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
     if (err) {
         console.error(err.message);
     }
-    console.log("Initialized ctfs table");
+    console.log("Initialized ctf DB");
 });
 
 export default function ctf() {
@@ -43,10 +43,9 @@ export default function ctf() {
                         res.end("ctf already exists");
                         return;
                     }
-                    console.error(err);
                     res.status(500);
                     res.end("server error");
-                    return;
+                    throw err;
                 }
                 res.status(200);
                 res.end("success");

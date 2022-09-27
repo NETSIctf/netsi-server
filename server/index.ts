@@ -37,7 +37,8 @@ app.use((request, response, next) => { // Upgrade to secure
     next();
 })
 
-app.use(morgan("combined"));
+var accessLogStream = fs.createWriteStream('access.log', { flags: 'a' })
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // routes
 app.use("/api", apis(socketManager)); // ALL apis
