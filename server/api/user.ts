@@ -65,7 +65,7 @@ export default function userApi(apis: Router) {
     });
 
     apis.post("/create", (req, res) => {
-        console.log("CREATE new user")
+        console.log(`CREATE new user ${req.body.username}`);
 
         bcrypt.hash(req.body.password, 12).then((resolve) => {
             db.run("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)", [uuidv4(), req.body.username, resolve], (err) => {
@@ -84,6 +84,7 @@ export default function userApi(apis: Router) {
                 } else {
                     console.log(`Created User ${req.body.username}`);
                     res.status(200);
+                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
                     res.end("success");
                     return;
                 }

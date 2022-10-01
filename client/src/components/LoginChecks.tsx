@@ -15,14 +15,17 @@ export function checkLoginNavigate() {// checks if the user is logged in. If the
   }, [])
 }
 
-export async function checkLogin() {
-  axios.get("/api/login").then(resolve => {
-    if (resolve.status !== 200) {
-      return false;
-    } else {
-      return true;
-    }
-  }).catch(() => {
-    return false;
+
+export function checkLogin() {
+  return new Promise((resolve: (value: boolean) => void) => {
+    axios.get("/api/login").then(response => {
+      if (response.status !== 200) {
+        resolve(true);
+      } else {
+        resolve(true);
+      }
+    }).catch(() => {
+      resolve(false);
+    })
   })
 }

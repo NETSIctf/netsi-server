@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +9,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loginFail, setLoginFail] = useState(false);
   const navigate = useNavigate();
-
-  checkLoginNavigate()
 
   function login() {
     axios.post("/api/login", { username: username, password: password })
