@@ -1,6 +1,5 @@
 import { Router } from "express";
 
-import verifyLogin from "../utils/verifyLogin";
 import sqlite3 from "sqlite3";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
@@ -28,7 +27,7 @@ export default function ctf() {
 
     router.post("/add", (req, res) => {
         // adds a new ctf
-        if (verifyLogin(req.cookies.token)) {
+        if (req.check_auth()) {
             // prevent spaces, slashes, or is empty in ctf name
             if (req.body.name.includes(" ") || req.body.name.includes("/") || req.body.name == "") {
                 res.status(400);
@@ -52,16 +51,11 @@ export default function ctf() {
                 return;
             })
         }
-        else {
-            res.status(401);
-            res.end("bad auth");
-            return;
-        }
     })
 
     router.get("/list", (req, res) => {
         // lists all ctfs
-        if (verifyLogin(req.cookies.token)) {
+        if (req.check_auth()) {
             db.all("SELECT name FROM ctfs", [], (err, rows) => {
                 if (err) {
                     console.error(err);
@@ -78,7 +72,7 @@ export default function ctf() {
 
     router.get("/:name", (req, res) => {
         // gets info about a ctf
-        if (verifyLogin(req.cookies.token)) {
+        if (req.check_auth()) {
             db.get("SELECT * FROM ctfs WHERE name = ?", [req.params.name], (err, row) => {
                 if (err) {
                     console.error(err);
@@ -96,16 +90,11 @@ export default function ctf() {
                 return;
             })
         }
-        else {
-            res.status(401);
-            res.end("bad auth");
-            return;
-        }
     })
 
     router.post("/delete/:name", (req, res) => {
         // deletes a ctf
-        if (verifyLogin(req.cookies.token)) {
+        if (req.check_auth()) {
             db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
                 if (err) {
                     console.error(err);
@@ -117,11 +106,6 @@ export default function ctf() {
                 res.end("success");
                 return;
             })
-        }
-        else {
-            res.status(401);
-            res.end("bad auth");
-            return;
         }
     })
 

@@ -1,7 +1,6 @@
 import { Router, Request, Response, response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import verifyLogin from "../utils/verifyLogin";
 import sqlite3 from "sqlite3";
 import { v4 as uuidv4 } from "uuid";
 
