@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import verifyLogin from "../utils/verifyLogin";
@@ -26,102 +26,69 @@ db.run(`CREATE TABLE IF NOT EXISTS users(
 });
 
 export default function userApi(apis: Router) {
-    apis.post("/login", (req: Request, res: Response) => {
-        /*db.get(`SELECT * FROM ctfs WHERE name = ?`, [req.body.username], (err, row) => {
-            if (err) {
-                console.error(err);
-                res.status(500);
-                res.end("server error");
-                return;
+    apis.post("/login", async (req: Request, res: Response) => {
+        if (sudoers.hasOwnProperty(req.body.username)) { // ADMIN
+            if (await bcrypt.compare(req.body.password, sudoers[req.body.username])) {
+                res.status(200);
+                res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                res.end("success");
+            } else {
+                res.auth_fail();
             }
-
-            if (row == )
-        })*/
-
-        if (sudoers.hasOwnProperty(req.body.username)) {
-            bcrypt.compare(req.body.password, sudoers[req.body.username])
-                .then(resolve => {
-                    if (resolve) {
-                        res.status(200);
-                        res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                        res.send("success");
-                        res.end();
-                    } else {
-                        res.status(401);
-                        res.end("bad auth");
-                        return;
-                    }
-                })
-                .catch(reject => {
-                    console.error(reject);
+        } else { // NORMAL USER
+            db.get(`SELECT * FROM users WHERE username = ?`, [req.body.username], async (err, row) => {
+                if (err) {
+                    console.error(err);
                     res.status(500);
                     res.end("server error");
-                    return;
-                })
-        } else {
-            res.status(401);
-            res.end("bad auth");
-            return;
+                }
+
+                if (await bcrypt.compare(req.body.password, row.password)) {
+                    res.status(200);
+                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.end("success");
+                } else {
+                    res.auth_fail();
+                }
+            });
         }
     });
 
     apis.get("/login", (req, res) => {
-        if (verifyLogin(req.cookies.token)) {
-            res.status(200);
-            res.end("success");
-            return;
-        } else {
-            res.status(401);
-            res.end("bad auth");
-            return;
-        }
+        req.check_auth();
     });
 
     apis.get("/logout", (req, res) => {
-        res.status(200);
         res.clearCookie("token");
+        res.status(200);
         res.end("success");
         return;
     });
 
     apis.post("/create", (req, res) => {
-        console.log(`ADMIN: Attempting to create user ${req.body.username}`);
+        console.log("CREATE new user")
 
-        if (verifyLogin(req.cookies.token)) {
-            let data = (jwt.verify(req.cookies.token, process.env.jwt_secret + "", { algorithms: ["HS256"] }) as any);
+        bcrypt.hash(req.body.password, 12).then((resolve) => {
+            db.run("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)", [uuidv4(), req.body.username, resolve], (err) => {
+                if (err) {
+                    if (err.message.includes("UNIQUE constraint failed")) {
+                        console.error("UNIQUE constraint failed");
 
-            if (sudoers.hasOwnProperty(data.username)) {
-                bcrypt.hash(req.body.password, 12).then((resolve) => {
-                    db.run("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)", [uuidv4(), req.body.username, resolve], (err) => {
-                        if (err) {
-                            if (err.message.includes("UNIQUE constraint failed")) {
-                                console.error("UNIQUE constraint failed");
-
-                                res.status(409);
-                                res.end("uname/pwd already exists");
-                                return;
-                            } else {
-                                res.status(500);
-                                res.end("server error");
-                                throw err;
-                            }
-                        } else {
-                            console.log(`Created User ${req.body.username}`);
-                            res.status(200);
-                            res.end("success");
-                            return;
-                        }
-                    });
-                })
-            } else {
-                res.status(401);
-                res.end("bad auth");
-                return;
-            }
-        } else {
-            res.status(401);
-            res.end("bad auth");
-            return;
-        }
+                        res.status(409);
+                        res.end("uname/pwd already exists");
+                        return;
+                    } else {
+                        res.status(500);
+                        res.end("server error");
+                        throw err;
+                    }
+                } else {
+                    console.log(`Created User ${req.body.username}`);
+                    res.status(200);
+                    res.end("success");
+                    return;
+                }
+            });
+        })
     })
 }

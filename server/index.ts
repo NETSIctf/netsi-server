@@ -18,6 +18,7 @@ import webhookMessage from "./utils/webhookMessage.js";
 import WSocket from "./utils/WSocket.js";
 
 import apis from "./api";
+import authMiddleware from "./utils/authMiddleware.js";
 
 // Init
 const socketManager = new WSocket();
@@ -35,9 +36,11 @@ app.use((request, response, next) => { // Upgrade to secure
     }
 
     next();
-})
+});
 
-var accessLogStream = fs.createWriteStream('access.log', { flags: 'a' })
+app.use(authMiddleware); // Auth Util Functions
+
+var accessLogStream = fs.createWriteStream('access.log', { flags: 'a' }); // logging
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // routes
