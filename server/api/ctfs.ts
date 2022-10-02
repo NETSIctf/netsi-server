@@ -74,7 +74,7 @@ export default function ctf() {
     router.post("/addMember/:ctfName", (req, res) => {
         // adds member to ctf
         if (req.check_auth()) {
-            let username = req.body.username;
+            let username = req.cookies.username;
             let ctfName = req.params.ctfName;
             db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (err) {

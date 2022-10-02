@@ -39,6 +39,21 @@ export default function View() {
     })
   }
 
+  function addMember() {
+    // adds a member to the CTF
+    axios.post("/api/ctfs/addMember/" + ctfName).then(resolve => {
+      console.log(resolve);
+      if (resolve.status === 200) {
+        // success
+        console.log("success");
+        navigate("/ctfs/" + ctfName);
+      }
+    }).catch(reject => {
+      console.error(reject);
+      alert("Error Joining CTF\n" + reject);
+    })
+  }
+
   useEffect(() => {
     axios.get(`/api/ctfs/${ctfName}`).then(result => {
       setStatus(result.status);
@@ -69,6 +84,7 @@ export default function View() {
               )
             })}
           </div>
+          <button onClick={addMember} className="btn btn-primary mt-2" >Join CTF</button>
           <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
         </div>
       )

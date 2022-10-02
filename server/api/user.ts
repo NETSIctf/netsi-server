@@ -30,6 +30,7 @@ export default function userApi(apis: Router) {
             if (await bcrypt.compare(req.body.password, sudoers[req.body.username])) {
                 res.status(200);
                 res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                res.cookie("username", req.body.username, { httpOnly: true, secure: true, sameSite: "strict" })
                 res.end("success");
             } else {
                 res.auth_fail();
@@ -45,6 +46,7 @@ export default function userApi(apis: Router) {
                 if (await bcrypt.compare(req.body.password, row.password)) {
                     res.status(200);
                     res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.cookie("username", row.username, { httpOnly: true, secure: true, sameSite: "strict" })
                     res.end("success");
                 } else {
                     res.auth_fail();
@@ -58,7 +60,7 @@ export default function userApi(apis: Router) {
     });
 
     apis.get("/logout", (req, res) => {
-        res.clearCookie("token");
+        res.clearCookie("token"); res.clearCookie("uuid"); res.clearCookie("username");
         res.status(200);
         res.end("success");
         return;
