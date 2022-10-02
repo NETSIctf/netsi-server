@@ -2,6 +2,7 @@
 server client site & api stuff
 
 hosted at [netsi.tk](https://netsi.tk)
+gcp e2-micro
 
 how to run (development environment)
 1. install node
