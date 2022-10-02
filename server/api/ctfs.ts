@@ -15,7 +15,8 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     start DATE NOT NULL,
-    end DATE NOT NULL)`, (err) => {
+    end DATE NOT NULL,
+    members TEXT UNIQUE)`, (err) => {
     if (err) {
         console.error(err.message);
     }
@@ -53,6 +54,79 @@ export default function ctf() {
         }
     })
 
+    router.post("/delete/:name", (req, res) => {
+        // deletes a ctf
+        if (req.check_auth()) {
+            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                res.status(200);
+                res.end("success");
+                return;
+            })
+        }
+    })
+
+    router.post("/addMember/:ctfName", (req, res) => {
+        // adds member to ctf
+        if (req.check_auth()) {
+            let username = req.body.username;
+            let ctfName = req.params.ctfName;
+            db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                if (!row) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+                if (row.members == null) {
+                    db.run("UPDATE ctfs SET members = ? WHERE name = ?", [username, ctfName], (err) => {
+                        if (err) {
+                            console.error(err);
+                            res.status(500);
+                            res.end("server error");
+                            return;
+                        }
+                        console.log("added member to ctf");
+                        res.status(200);
+                        res.end("success");
+                        return;
+                    })
+                    return;
+                }
+                let members = row.members.split(",");
+                console.log(members);
+                if (members.includes(username)) {
+                    res.status(409);
+                    res.end("user already in ctf");
+                    return;
+                }
+                members.push(username);
+                db.run("UPDATE ctfs SET members = ? WHERE name = ?", [members.join(","), ctfName], (err) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(500);
+                        res.end("server error");
+                        return;
+                    }
+                    res.status(200);
+                    res.end("success");
+                    return;
+                })
+            })
+
+        }
+    })
+
     router.get("/list", (req, res) => {
         // lists all ctfs
         if (req.check_auth()) {
@@ -87,23 +161,6 @@ export default function ctf() {
                 }
                 res.status(200);
                 res.json(row);
-                return;
-            })
-        }
-    })
-
-    router.post("/delete/:name", (req, res) => {
-        // deletes a ctf
-        if (req.check_auth()) {
-            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-                res.status(200);
-                res.end("success");
                 return;
             })
         }
