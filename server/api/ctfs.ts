@@ -159,6 +159,7 @@ export default function ctf() {
                     res.end("ctf not found");
                     return;
                 }
+                row.members = row.members.split(",");
                 res.status(200);
                 res.json(row);
                 return;

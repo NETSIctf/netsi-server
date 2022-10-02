@@ -8,14 +8,15 @@ type ctfData = {
   name: string,
   description: string,
   start: string,
-  end: string
+  end: string,
+  members: string[],
 }
 
 export default function View() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "" });
+  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: ['none']});
   const [status, setStatus] = useState<number>(200);
 
   checkLoginNavigate();
@@ -60,6 +61,14 @@ export default function View() {
           <p>{ctf.description}</p>
           <p>Start: {ctf.start}</p>
           <p>End: {ctf.end}</p>
+          Members:
+          <div className={`list-group`}>
+            {ctf.members.map((member, index) => {
+              return (
+                <div className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >{member}</div>
+              )
+            })}
+          </div>
           <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
         </div>
       )
