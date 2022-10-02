@@ -22,7 +22,6 @@ export default function monitorApi(apis: Router, socketManager: WSocket) {
     })
 
     socketManager.addMessage("initMonitor", (msg, socket) => {
-        console.log("monDataInit");
         sockets.push(socket);
         socket.emit("monDataInit", JSON.stringify(monData));
     })

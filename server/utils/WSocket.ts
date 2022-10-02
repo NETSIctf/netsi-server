@@ -1,6 +1,9 @@
 import { Server, Socket } from "socket.io";
 import http from "node:http";
 
+import cookie from "cookie";
+import { check_auth } from "./authMiddleware";
+
 export type messageListener = { message: string, handler: (msg: string, socket: Socket) => void }
 
 export default class WSocket {
@@ -14,7 +17,13 @@ export default class WSocket {
     }
 
     #onConnection(socket: Socket) {
-        console.log("User connected");
+        let cookies = cookie.parse(socket.handshake.headers.cookie || "");
+
+        if (!cookies.token || !check_auth(cookies.token)) {
+            socket.emit("bad auth");
+            socket.disconnect();
+            return;
+        }
 
         this.message.forEach(i => {
             socket.on(i.message, (msg) => i.handler(msg, socket));
