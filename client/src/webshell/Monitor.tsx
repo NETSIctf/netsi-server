@@ -11,6 +11,16 @@ type monDataOptions = {
     showHeaders: boolean
 }
 
+const helpMessage = `
+set - Sets an Option
+get - Gets a value
+help - Shows this help page
+clear - Clears console
+
+LIST OF OPTIONS:
+showheaders - true/false - Shows the header field or not.
+`
+
 export default function Monitor() {
     const [termData, setTermData] = useState<(TerminalOutput | TerminalInput)[]>([]);
 
@@ -85,14 +95,10 @@ export default function Monitor() {
         const args = text.split(" ");
         switch (args[0]) {
             case "help":
-                appendTermData(`
-set - Sets an Option
-get - Gets a value
-help - Shows this help page
-
-LIST OF OPTIONS:
-showheaders - true/false - Shows the header field or not.
-                `);
+                appendTermData(helpMessage);
+                break;
+            case "clear":
+                setTermData([]);
                 break;
             case "set":
                 cmdOptionSet(args.slice(1, args.length));
