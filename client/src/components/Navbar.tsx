@@ -1,19 +1,22 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import BsNavbar from "react-bootstrap/Navbar";
 import { checkLogin } from "./LoginChecks";
 
 function Navbar() {
   const [login, setLogin] = useState<ReactNode[]>([<Link key={"logout"} className="navbar-brand" to="/logout">Logout</Link>]);
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    (async () => {
-      if (!await checkLogin()) {
+    checkLogin().then(resolve => {
+      if (resolve) {
+        setLogin([<Link key={"logout"} className="navbar-brand" to="/logout">Logout</Link>]);
+      } else {
         setLogin([<Link key={"login"} className="navbar-brand" to="/login">Login</Link>, <Link key={"register"} className="navbar-brand" to="/register">Register</Link>]);
       }
-    })();
-  }, []);
+    })
+  }, [pathname]);
 
   return (
     <BsNavbar variant="dark" bg="dark" expand="lg" className="text-light" >

@@ -56,7 +56,10 @@ export default function userApi(apis: Router) {
     });
 
     apis.get("/login", (req, res) => {
-        req.check_auth();
+        if (req.check_auth()) {
+            res.status(200);
+            res.end("success");
+        } 
     });
 
     apis.get("/logout", (req, res) => {

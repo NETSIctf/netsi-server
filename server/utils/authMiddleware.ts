@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 export default function authMiddleware(request: Request, response: Response, next: NextFunction) {
     response.auth_fail = () => auth_fail(response);
-    request.check_auth = () => check_auth(request, response);
+    request.check_auth = (userOrAdmin: "user" | "admin") => check_auth(request, response, userOrAdmin);
 
     next();
 }

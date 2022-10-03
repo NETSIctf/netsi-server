@@ -28,7 +28,7 @@ export default function ctf() {
 
     router.post("/add", (req, res) => {
         // adds a new ctf
-        if (req.check_auth()) {
+        if (req.check_auth("admin")) {
             // prevent spaces, slashes, or is empty in ctf name
             if (req.body.name.includes(" ") || req.body.name.includes("/") || req.body.name == "") {
                 res.status(400);
@@ -56,7 +56,7 @@ export default function ctf() {
 
     router.post("/delete/:name", (req, res) => {
         // deletes a ctf
-        if (req.check_auth()) {
+        if (req.check_auth("admin")) {
             db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
                 if (err) {
                     console.error(err);

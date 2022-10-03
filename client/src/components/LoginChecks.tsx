@@ -20,7 +20,7 @@ export function checkLogin() {
   return new Promise((resolve: (value: boolean) => void) => {
     axios.get("/api/login").then(response => {
       if (response.status !== 200) {
-        resolve(true);
+        resolve(false);
       } else {
         resolve(true);
       }
