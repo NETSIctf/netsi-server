@@ -34,7 +34,7 @@ function Login() {
 
       <div className={`d-flex flex-column justify-content-center align-items-center`} onKeyDown={e => e.key == "Enter" ? login() : null} >
         <div className={`bg-danger p-2 rounded d-${loginFail ? "block" : "none"}`} >
-          Nobody expected that your username or password could be wrong, but it is.
+          Nobody expected that your username or password could be wrong, but it somehow is.
         </div>
 
         <div className={`mt-2`} >
