@@ -83,11 +83,13 @@ export default function ctf() {
                     res.end("server error");
                     return;
                 }
+
                 if (!row) {
                     res.status(404);
                     res.end("ctf not found");
                     return;
                 }
+
                 if (row.members == null) {
                     db.run("UPDATE ctfs SET members = ? WHERE name = ?", [username, ctfName], (err) => {
                         if (err) {
@@ -103,13 +105,17 @@ export default function ctf() {
                     })
                     return;
                 }
+
+                console.log(row)
                 let members = row.members.split(",");
                 console.log(members);
+
                 if (members.includes(username)) {
                     res.status(409);
                     res.end("user already in ctf");
                     return;
                 }
+
                 members.push(username);
                 db.run("UPDATE ctfs SET members = ? WHERE name = ?", [members.join(","), ctfName], (err) => {
                     if (err) {
