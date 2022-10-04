@@ -8,7 +8,6 @@ import Login from './Login'
 import Navbar from './components/Navbar'
 import Logout from './Logout'
 import CTFs from "./ctfs/Index";
-import Admin from './admin/Admin';
 import Register from './Register'
 import "./scss/main.scss";
 
@@ -24,7 +23,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Route path="logout" element={<Logout />} />
         <Route path="register" element={<Register />} />
         <Route path="ctfs/*" element={<CTFs />} />
-        <Route path="admin/*" element={<Admin />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
