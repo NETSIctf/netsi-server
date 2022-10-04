@@ -43,6 +43,7 @@ export default function ctf() {
                         res.end("ctf already exists");
                         return;
                     }
+                    console.error(err);
                     res.status(500);
                     res.end("server error");
                     throw err;

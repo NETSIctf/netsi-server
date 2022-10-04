@@ -70,7 +70,6 @@ export default function View() {
       result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
       result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
 
-      console.log(result.data.members.includes(parseCookie(document.cookie).username));
       if (document.cookie && result.data.members.includes(parseCookie(document.cookie).username)) {
         setJoined(true);
       }
