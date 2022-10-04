@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useParams } from "react-router-dom";
+import { parseCookie } from "../util";
 
 type ctfData = {
   name: string,
@@ -16,32 +17,39 @@ export default function View() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: ['none']});
+  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: ['none'] });
   const [status, setStatus] = useState<number>(200);
+  const [joining, setJoining] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const [isAdmin, setAdmin] = useState(false);
 
   checkLoginNavigate();
 
   // get the ctf name from the url
   const ctfName = params.ctfId;
 
-  function deleteCTF() {
-    // deletes a CTF from the database
+  function deleteCTF() {// deletes a CTF from the database
+    setDeleting(true);
     axios.post("/api/ctfs/delete/" + ctfName).then(resolve => {
-      console.log(resolve);
+      setDeleting(false);
       if (resolve.status === 200) {
         // success
         console.log("success");
         navigate("/ctfs");
       }
     }).catch(reject => {
+      setDeleting(false);
       console.error(reject);
       alert("Error deleting CTF\n" + reject);
     })
   }
 
   function addMember() {
+    setJoining(true);
     // adds a member to the CTF
     axios.post("/api/ctfs/addMember/" + ctfName).then(resolve => {
+      setJoining(false);
       console.log(resolve);
       if (resolve.status === 200) {
         // success
@@ -49,12 +57,13 @@ export default function View() {
         navigate("/ctfs/" + ctfName);
       }
     }).catch(reject => {
+      setJoining(false);
       console.error(reject);
       alert("Error Joining CTF\n" + reject);
     })
   }
 
-  useEffect(() => {
+  useEffect(() => { // load the ctf
     axios.get(`/api/ctfs/${ctfName}`).then(result => {
       setStatus(result.status);
 
@@ -62,10 +71,30 @@ export default function View() {
       result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
       result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
 
+      console.log(result.data.members.includes(parseCookie(document.cookie).username));
+      if (document.cookie && result.data.members.includes(parseCookie(document.cookie).username)) {
+        setJoined(true);
+      }
+
       setCtf(result.data);
     }).catch((reject: AxiosError) => {
       setStatus(reject.response?.status || 500);
     })
+
+    axios.get("/api/login", { params: { admin: true } })
+      .then(resolve => {
+        if (resolve.status == 200) {
+          setAdmin(true);
+        } else {
+          setAdmin(false);
+        }
+      }).catch((err: AxiosError) => {
+        if (err.response?.status == 500) {
+          window.alert("500 ISE while attempting to auth");
+        } else {
+          setAdmin(false);
+        }
+      })
   }, [])
 
   switch (status) {
@@ -84,8 +113,8 @@ export default function View() {
               )
             })}
           </div>
-          <button onClick={addMember} className="btn btn-primary mt-2" >Join CTF</button>
-          <button onClick={deleteCTF} className="btn btn-danger">Delete CTF</button>
+          {joined ? null : <button onClick={() => addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : "Join CTF"}</button>}
+          {isAdmin ? <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button> : null}
         </div>
       )
     case 404:
@@ -96,7 +125,7 @@ export default function View() {
       </div>
     default:
       return <div>
-        Code {status}
+        Code {status} we don't know whats wrong lol
       </div>
   }
 

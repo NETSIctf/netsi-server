@@ -30,7 +30,7 @@ export default function userApi(apis: Router) {
             if (await bcrypt.compare(req.body.password, sudoers[req.body.username])) {
                 res.status(200);
                 res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                res.cookie("username", req.body.username, { httpOnly: true, secure: true, sameSite: "strict" })
+                res.cookie("username", req.body.username, { httpOnly: false, secure: true, sameSite: "strict" })
                 res.end("success");
             } else {
                 res.auth_fail();
@@ -46,7 +46,7 @@ export default function userApi(apis: Router) {
                 if (await bcrypt.compare(req.body.password, row.password)) {
                     res.status(200);
                     res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                    res.cookie("username", row.username, { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.cookie("username", row.username, { httpOnly: false, secure: true, sameSite: "strict" })
                     res.end("success");
                 } else {
                     res.auth_fail();
@@ -56,10 +56,14 @@ export default function userApi(apis: Router) {
     });
 
     apis.get("/login", (req, res) => {
-        if (req.check_auth()) {
+        let userOrAdmin = "user";
+        if (req.query.admin && req.query.admin !== "false") {
+            userOrAdmin = "admin";
+        }
+        if (req.check_auth(userOrAdmin)) {
             res.status(200);
             res.end("success");
-        } 
+        }
     });
 
     apis.get("/logout", (req, res) => {
