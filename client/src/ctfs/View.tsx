@@ -53,8 +53,7 @@ export default function View() {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
-        console.log("success");
-        navigate("/ctfs/" + ctfName);
+        window.location.reload();
       }
     }).catch(reject => {
       setJoining(false);
