@@ -172,6 +172,7 @@ export default function ctf() {
                 else {
                     row.members = row.members.split(",");
                 }
+                row.username = req.cookies.username;
                 res.status(200);
                 res.json(row);
                 return;

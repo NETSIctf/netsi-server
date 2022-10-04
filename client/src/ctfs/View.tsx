@@ -3,7 +3,6 @@ import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useParams } from "react-router-dom";
-import { parseCookie } from "../util";
 
 type ctfData = {
   name: string,
@@ -70,7 +69,7 @@ export default function View() {
       result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
       result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
 
-      if (document.cookie && result.data.members.includes(parseCookie(document.cookie).username)) {
+      if (result.data.members.includes(result.data.username)) {
         setJoined(true);
       }
 
