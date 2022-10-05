@@ -19,7 +19,7 @@ export default function Register() {
                 setRStatus(false);
 
                 if (response.status == 200) {
-                    navigate("/login");
+                    navigate("/login?new-user=true");
                 }
             })
             .catch((err: AxiosError) => {

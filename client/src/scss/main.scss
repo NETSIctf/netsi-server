@@ -39,6 +39,7 @@ body, html, #root {
 .dark-list-group-item {
     background-color: $primary;
     color: $light;
+    text-align: center;
 }
 
 .dark-list-group-item:hover {
