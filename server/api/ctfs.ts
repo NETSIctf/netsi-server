@@ -44,6 +44,19 @@ export default function ctf() {
             return;
         })
 
+        // if members are empty, set members to null
+        if (members.length === 0) {
+            db.run("UPDATE ctfs SET members = ? WHERE name = ?", [null, ctfName], (err) => {
+                if (err) {
+                    console.error(err);
+                    returnVal = [500, "server error"];
+                    return;
+                }
+                returnVal = [200, "success"];
+                return;
+            })
+        }
+
         return returnVal;
     }
 
