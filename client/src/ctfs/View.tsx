@@ -16,7 +16,7 @@ export default function View() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: ['none'] });
+  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [] });
   const [status, setStatus] = useState<number>(200);
   const [joining, setJoining] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -88,6 +88,11 @@ export default function View() {
 
       if (result.data.members.includes(result.data.username)) {
         setJoined(true);
+      }
+
+      if (!result.data.members.length) {
+        // if there are no members, display none
+        result.data.members = ['none'];
       }
 
       setCtf(result.data);
