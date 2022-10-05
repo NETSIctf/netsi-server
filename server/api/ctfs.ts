@@ -16,7 +16,7 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
     description TEXT NOT NULL,
     start DATE NOT NULL,
     end DATE NOT NULL,
-    members TEXT UNIQUE)`, (err) => {
+    members TEXT)`, (err) => {
     if (err) {
         console.error(err.message);
     }
