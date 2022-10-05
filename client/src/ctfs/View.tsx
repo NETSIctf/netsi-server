@@ -61,6 +61,23 @@ export default function View() {
     })
   }
 
+  function removeMember() {
+    setJoining(true);
+    // removes a member from the CTF
+    axios.post("/api/ctfs/removeMember/" + ctfName).then(resolve => {
+      setJoining(false);
+      console.log(resolve);
+      if (resolve.status === 200) {
+        // success
+        window.location.reload();
+      }
+    }).catch(reject => {
+      setJoining(false);
+      console.error(reject);
+      alert("Error Leaving CTF\n" + reject);
+    })
+  }
+
   useEffect(() => { // load the ctf
     axios.get(`/api/ctfs/${ctfName}`).then(result => {
       setStatus(result.status);
@@ -110,7 +127,7 @@ export default function View() {
               )
             })}
           </div>
-          {joined ? null : <button onClick={() => addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : "Join CTF"}</button>}
+          {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
           {isAdmin ? <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button> : null}
         </div>
       )

@@ -26,6 +26,27 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
 export default function ctf() {
     const router = Router();
 
+    function updateMembers(members:string[], ctfName: string): [number, string]{
+        /*
+            update members in db
+            args: members: string[], ctfName: string - members to update, ctf name
+            returns: [number, string] - [status code, message]
+        */
+
+        let returnVal: [number, string] = [200, "success"];
+        db.run("UPDATE ctfs SET members = ? WHERE name = ?", [members.join(","), ctfName], (err) => {
+            if (err) {
+                console.error(err);
+                returnVal = [500, "server error"];
+                return;
+            }
+            returnVal = [200, "success"];
+            return;
+        })
+
+        return returnVal;
+    }
+
     router.post("/add", (req, res) => {
         // adds a new ctf
         if (req.check_auth("admin")) {
@@ -118,19 +139,52 @@ export default function ctf() {
                 }
 
                 members.push(username);
-                db.run("UPDATE ctfs SET members = ? WHERE name = ?", [members.join(","), ctfName], (err) => {
-                    if (err) {
-                        console.error(err);
-                        res.status(500);
-                        res.end("server error");
-                        return;
-                    }
-                    res.status(200);
-                    res.end("success");
-                    return;
-                })
+                let [status, message] = updateMembers(members, ctfName);
+                res.status(status);
+                res.end(message);
             })
 
+        }
+    })
+
+    router.post("/removeMember/:ctfName", (req, res) => {
+        // removes member from ctf
+        if (req.check_auth()) {
+            let username = req.cookies.username;
+            let ctfName = req.params.ctfName;
+            db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+
+                if (!row) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+
+                if (row.members == null) {
+                    res.status(404);
+                    res.end("user not in ctf");
+                    return;
+                }
+
+                let members = row.members.split(",");
+
+                if (!members.includes(username)) {
+                    res.status(404);
+                    res.end("user not in ctf");
+                    return;
+                }
+
+                members.splice(members.indexOf(username), 1);
+                let [status, message] = updateMembers(members, ctfName);
+                res.status(status);
+                res.end(message);
+            })
         }
     })
 
