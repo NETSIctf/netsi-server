@@ -34,7 +34,7 @@ export default function Add() {
       }
       else if (reject.response.data == "Invalid name") {
         console.log("Invalid name");
-        setError("Invalid name. Names cannot contain spaces, slashes, or be empty.");
+        setError("Invalid name. Names must be a letter or a number.");
       }
       else if (reject.response.data.includes("Name too long")) {
         console.log(reject.response.data);
@@ -43,6 +43,10 @@ export default function Add() {
       else if (reject.response.data.includes("Description too long")) {
         console.log(reject.response.data);
         setError(reject.response.data);
+      }
+      else {
+        console.log("Error adding CTF");
+        setError("Error adding CTF, please try again later.");
       }
     })
   }

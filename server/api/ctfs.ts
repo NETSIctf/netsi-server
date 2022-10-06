@@ -68,8 +68,8 @@ export default function ctf() {
     router.post("/add", (req, res) => {
         // adds a new ctf
         if (req.check_auth("admin")) {
-            // prevent spaces, slashes, or is empty in ctf name
-            if (req.body.name.includes(" ") || req.body.name.includes("/") || req.body.name == "") {
+            // check if name is valid (only contains letters and numbers)
+            if (req.body.name.match(/^[a-zA-Z0-9]+$/) === null) {
                 res.status(400);
                 res.end("Invalid name");
                 return;
