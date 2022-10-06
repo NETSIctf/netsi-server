@@ -42,8 +42,7 @@ export default function userApi(apis: Router) {
                     res.status(500);
                     res.end("server error");
                 }
-
-                if (await bcrypt.compare(req.body.password, row.password)) {
+                if (row && await bcrypt.compare(req.body.password, row.password)) {
                     res.status(200);
                     res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
                     res.cookie("username", row.username, { httpOnly: false, secure: true, sameSite: "strict" })
