@@ -36,6 +36,14 @@ export default function Add() {
         console.log("Invalid name");
         setError("Invalid name. Names cannot contain spaces, slashes, or be empty.");
       }
+      else if (reject.response.data.includes("Name too long")) {
+        console.log(reject.response.data);
+        setError(reject.response.data);
+      }
+      else if (reject.response.data.includes("Description too long")) {
+        console.log(reject.response.data);
+        setError(reject.response.data);
+      }
     })
   }
 

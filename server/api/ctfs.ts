@@ -9,19 +9,24 @@ const db = new sqlite3.Database("ctf.db", (err) => {
     console.log("Connected to the database.");
 });
 
+const maxNameLength = 64;
+const maxDescriptionLength = 1024;
+
 // create ctfs table if it doesn't exist
 db.run(`CREATE TABLE IF NOT EXISTS ctfs( 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    description TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE CHECK(length(name) < ${maxNameLength + 1}),
+    description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}),
     start DATE NOT NULL,
     end DATE NOT NULL,
-    members TEXT)`, (err) => {
-    if (err) {
-        console.error(err.message);
+    members TEXT)`,
+    (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log("Initialized ctf DB");
     }
-    console.log("Initialized ctf DB");
-});
+);
 
 export default function ctf() {
     const router = Router();
@@ -75,6 +80,16 @@ export default function ctf() {
                     if (err.message.includes("UNIQUE constraint failed")) {
                         res.status(409);
                         res.end("ctf already exists");
+                        return;
+                    }
+                    else if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
+                        res.status(400);
+                        res.end(`Name too long, max ${maxNameLength} characters`);
+                        return;
+                    }
+                    else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
+                        res.status(400);
+                        res.end(`Description too long, max ${maxDescriptionLength} characters`);
                         return;
                     }
                     console.error(err);
