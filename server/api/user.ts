@@ -1,4 +1,4 @@
-import { Router, Request, Response, response } from "express";
+import { Router, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sqlite3 from "sqlite3";
@@ -76,6 +76,20 @@ export default function userApi(apis: Router) {
     apis.post("/create", (req, res) => {
         console.log(`CREATE new user ${req.body.username}`);
 
+        // disallow empty username
+        if (req.body.username === "" || req.body.username === undefined) {
+            res.status(400);
+            res.end("Username cannot be empty");
+            return;
+        }
+
+        // disallow empty password
+        if (req.body.password === "" || req.body.password === undefined) {
+            res.status(400);
+            res.end("Password cannot be empty");
+            return;
+        }
+
         bcrypt.hash(req.body.password, 12).then((resolve) => {
             db.run("INSERT INTO users (uuid, username, password) VALUES (?, ?, ?)", [uuidv4(), req.body.username, resolve], (err) => {
                 if (err) {
@@ -83,14 +97,16 @@ export default function userApi(apis: Router) {
                         console.error("UNIQUE constraint failed");
 
                         res.status(409);
-                        res.end("uname/pwd already exists");
+                        res.end("username already exists");
                         return;
                     } else {
                         res.status(500);
                         res.end("server error");
                         throw err;
                     }
-                } else {
+                }
+
+                else {
                     console.log(`Created User ${req.body.username}`);
                     res.status(200);
                     res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
