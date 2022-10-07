@@ -46,3 +46,11 @@ body, html, #root {
     background-color: $secondary;
     color: $light;
 }
+
+.red-text {
+    color: $danger;
+}
+
+.green-text {
+    color: $success;
+}

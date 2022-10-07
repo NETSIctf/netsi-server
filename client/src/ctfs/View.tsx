@@ -4,19 +4,27 @@ import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useParams } from "react-router-dom";
 
+type challenge = {
+  name: string,
+  description: string,
+  points: number,
+  solved_by: string
+}
+
 type ctfData = {
   name: string,
   description: string,
   start: string,
   end: string,
   members: string[],
+  challenges: challenge[],
 }
 
 export default function View() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [] });
+  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [], challenges: [] });
   const [status, setStatus] = useState<number>(200);
   const [joining, setJoining] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -124,11 +132,24 @@ export default function View() {
           <p>{ctf.description}</p>
           <p>Start: {ctf.start}</p>
           <p>End: {ctf.end}</p>
-          Members:
+          <p>Members:</p>
           <div className={`list-group`}>
             {ctf.members.map((member, index) => {
               return (
                 <div className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >{member}</div>
+              )
+            })}
+          </div>
+          <p className={`mt-3`}>Challenges:</p>
+          <div className={`list-group`}>
+            {ctf.challenges.length === 0 ? <div className={`list-group-item list-group-item-action dark-list-group-item`}>none</div> : ctf.challenges.map((challenge, index) => {
+              return (
+                <div className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >
+                  <h3 className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.name}</h3>
+                  <p>{challenge.description}</p>
+                  <p>Points: {challenge.points}</p>
+                  <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
+                </div>
               )
             })}
           </div>

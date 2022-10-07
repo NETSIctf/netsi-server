@@ -28,6 +28,23 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
     }
 );
 
+// add challenges table if it doesn't exist
+db.run(`CREATE TABLE IF NOT EXISTS challenges(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ctf_id INTEGER NOT NULL,
+    name TEXT NOT NULL UNIQUE CHECK(length(name) < ${maxNameLength + 1}),
+    description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}),
+    points INTEGER NOT NULL CHECK(points >= 0),
+    solved_by TEXT,
+    FOREIGN KEY (ctf_id) REFERENCES ctfs(id))`,
+    (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log("Initialized challenges DB");
+    }
+);
+
 export default function ctf() {
     const router = Router();
 
@@ -175,6 +192,50 @@ export default function ctf() {
         }
     })
 
+    router.post("/addChallenge/:ctfName", (req, res) => {
+        if (req.check_auth()) {
+            let ctfName = req.params.ctfName;
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                if (!row) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+                db.run("INSERT INTO challenges (ctf_id, name, description, points) VALUES (?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points], (err) => {
+                    if (err) {
+                        if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
+                            res.status(400);
+                            res.end(`Name too long, max ${maxNameLength} characters`);
+                            return;
+                        } else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
+                            res.status(400);
+                            res.end(`Description too long, max ${maxDescriptionLength} characters`);
+                            return;
+                        } else if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
+                            res.status(400);
+                            res.end("Points must be greater than 0");
+                            return;
+                        }
+                        console.error(err);
+                        res.status(500);
+                        res.end("server error");
+                        return;
+                    }
+                    res.status(200);
+                    res.end("success");
+                    return;
+                })
+            })
+        }
+    })
+
+
     router.post("/removeMember/:ctfName", (req, res) => {
         // removes member from ctf
         if (req.check_auth()) {
@@ -255,9 +316,29 @@ export default function ctf() {
                     row.members = row.members.split(",");
                 }
                 row.username = req.cookies.username;
-                res.status(200);
-                res.json(row);
-                return;
+
+                db.get("SELECT * FROM challenges WHERE ctf_id = ?", [row.id], (err, row2) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(500);
+                        res.end("server error");
+                        return;
+                    }
+                    if (row2 == undefined) {
+                        row.challenges = [];
+                    }
+                    else {
+                        row.challenges = [row2];
+                    }
+
+                    for (let i = 0; i < row.challenges.length; i++) {
+                        delete row.challenges[i].id;
+                        delete row.challenges[i].ctf_id;
+                    }
+                    res.status(200);
+                    res.json(row);
+                    return;
+                })
             })
         }
     })
