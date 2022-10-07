@@ -149,9 +149,7 @@ export default function ctf() {
                     return;
                 }
 
-                console.log(row)
                 let members = row.members.split(",");
-                console.log(members);
 
                 if (members.includes(username)) {
                     res.status(409);
