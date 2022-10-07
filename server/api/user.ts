@@ -45,9 +45,14 @@ export default function userApi(apis: Router) {
         const username: string = req.body?.username;
         const password: string = req.body?.password;
 
-        if (!username || !password) {
-            res.status(403);
-            res.end("Missing username/password field");
+        if (!username) {
+            res.status(400);
+            res.end("Username cannot be empty");
+            return false;
+        }
+        if (!password) {
+            res.status(400);
+            res.end("Password cannot be empty");
             return false;
         }
 
@@ -94,15 +99,18 @@ export default function userApi(apis: Router) {
     apis.post("/create", (req, res) => {
         console.log(`CREATE new user ${req.body.username}`);
 
+        const username = req.body?.username;
+        const password = req.body?.password;
+
         // disallow empty username
-        if (req.body.username === "" || req.body.username === undefined) {
+        if (!username) {
             res.status(400);
             res.end("Username cannot be empty");
             return;
         }
 
         // disallow empty password
-        if (req.body.password === "" || req.body.password === undefined) {
+        if (!password) {
             res.status(400);
             res.end("Password cannot be empty");
             return;
@@ -122,12 +130,10 @@ export default function userApi(apis: Router) {
                         res.end("server error");
                         throw err;
                     }
-                }
-
-                else {
+                } else {
                     console.log(`Created User ${req.body.username}`);
                     res.status(200);
-                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.cookie("token", signToken(username, "user"));
                     res.end("success");
                     return;
                 }
