@@ -26,25 +26,34 @@ db.run(`CREATE TABLE IF NOT EXISTS users(
 
 export default function userApi(apis: Router) {
     apis.post("/login", async (req: Request, res: Response) => {
-        if (sudoers.hasOwnProperty(req.body.username)) { // ADMIN
-            if (await bcrypt.compare(req.body.password, sudoers[req.body.username])) {
+        const username: string = req.body?.username;
+        const password: string = req.body?.password;
+
+        if (!username || !password) {
+            res.status(403);
+            res.end("Missing username/password field");
+            return false;
+        }
+
+        if (sudoers.hasOwnProperty(username)) { // ADMIN
+            if (await bcrypt.compare(password, sudoers[username])) {
                 res.status(200);
-                res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                res.cookie("username", req.body.username, { httpOnly: false, secure: true, sameSite: "strict" })
+                res.cookie("token", jwt.sign({ username: username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                res.cookie("username", username, { httpOnly: false, secure: true, sameSite: "strict" })
                 res.end("success");
             } else {
                 res.auth_fail();
             }
         } else { // NORMAL USER
-            db.get(`SELECT * FROM users WHERE username = ?`, [req.body.username], async (err, row) => {
+            db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, row) => {
                 if (err) {
                     console.error(err);
                     res.status(500);
                     res.end("server error");
                 }
-                if (row && await bcrypt.compare(req.body.password, row.password)) {
+                if (row && await bcrypt.compare(password, row.password)) {
                     res.status(200);
-                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.cookie("token", jwt.sign({ username: username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
                     res.cookie("username", row.username, { httpOnly: false, secure: true, sameSite: "strict" })
                     res.end("success");
                 } else {
