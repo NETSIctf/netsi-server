@@ -16,7 +16,7 @@ export default function apis(socketManager: WSocket) {
 
     router.get("/status", (req, res) => {
         res.status(200);
-        res.end("NOBODY EXPECTS THE PONG INQUISITION");
+        res.end("NOBODY EXPECTS THE PONG");
     });
 
     return router;
