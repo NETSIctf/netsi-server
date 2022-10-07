@@ -61,9 +61,6 @@ function Login() {
         <div className={`mt-2`} >
           <Button variant="primary" onClick={() => login()} >Login</Button>
         </div>
-        <div>
-          Nobody expected you had to login. <a href="/register" >Register here.</a>
-        </div>
       </div>
     </div>
   )

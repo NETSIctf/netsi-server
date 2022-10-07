@@ -24,33 +24,57 @@ db.run(`CREATE TABLE IF NOT EXISTS users(
     console.log("Initialized user DB");
 });
 
+function signToken(username: string, perms: "user" | "admin") {
+    return jwt.sign({ username: username, perms: perms }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" }
+}
+
+function getUser(username: string) {
+    return new Promise((resolve: (row: any) => void, reject: (err: Error) => void) => {
+        db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+
+            resolve(row);
+        })
+    })
+}
+
 export default function userApi(apis: Router) {
     apis.post("/login", async (req: Request, res: Response) => {
-        if (sudoers.hasOwnProperty(req.body.username)) { // ADMIN
-            if (await bcrypt.compare(req.body.password, sudoers[req.body.username])) {
-                res.status(200);
-                res.cookie("token", jwt.sign({ username: req.body.username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                res.cookie("username", req.body.username, { httpOnly: false, secure: true, sameSite: "strict" })
-                res.end("success");
-            } else {
-                res.auth_fail();
-            }
-        } else { // NORMAL USER
-            db.get(`SELECT * FROM users WHERE username = ?`, [req.body.username], async (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                }
-                if (row && await bcrypt.compare(req.body.password, row.password)) {
-                    res.status(200);
-                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                    res.cookie("username", row.username, { httpOnly: false, secure: true, sameSite: "strict" })
-                    res.end("success");
-                } else {
-                    res.auth_fail();
-                }
-            });
+        const username: string = req.body?.username;
+        const password: string = req.body?.password;
+
+        if (!username) {
+            res.status(400);
+            res.end("Username cannot be empty");
+            return false;
+        }
+        if (!password) {
+            res.status(400);
+            res.end("Password cannot be empty");
+            return false;
+        }
+
+        var hash = "";
+        var type: Parameters<typeof signToken>[1] = "user";
+
+        if (sudoers.hasOwnProperty(username)) {
+            hash = sudoers[username];
+            type = "admin";
+        } else {
+            let user = await getUser(username);
+            hash = user.password;
+            type = "user";
+        }
+
+        if (await bcrypt.compare(password, hash)) {
+            res.status(200);
+            res.cookie("token", signToken(username, type));
+            res.cookie("username", username);
+            res.end("success");
+        } else {
+            res.auth_fail();
         }
     });
 
@@ -75,15 +99,18 @@ export default function userApi(apis: Router) {
     apis.post("/create", (req, res) => {
         console.log(`CREATE new user ${req.body.username}`);
 
+        const username = req.body?.username;
+        const password = req.body?.password;
+
         // disallow empty username
-        if (req.body.username === "" || req.body.username === undefined) {
+        if (!username) {
             res.status(400);
             res.end("Username cannot be empty");
             return;
         }
 
         // disallow empty password
-        if (req.body.password === "" || req.body.password === undefined) {
+        if (!password) {
             res.status(400);
             res.end("Password cannot be empty");
             return;
@@ -103,12 +130,10 @@ export default function userApi(apis: Router) {
                         res.end("server error");
                         throw err;
                     }
-                }
-
-                else {
+                } else {
                     console.log(`Created User ${req.body.username}`);
                     res.status(200);
-                    res.cookie("token", jwt.sign({ username: req.body.username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
+                    res.cookie("token", signToken(username, "user"));
                     res.end("success");
                     return;
                 }

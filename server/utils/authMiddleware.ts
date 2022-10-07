@@ -14,7 +14,7 @@ export function auth_fail(response: Response) {
 }
 
 export function check_auth(a: Request, b: Response, c?: "user" | "admin"): boolean;
-export function check_auth(a: string, b: "user" | "admin"): boolean;
+export function check_auth(a: string, b?: "user" | "admin"): boolean;
 export function check_auth(a: Request | string, b?: Response | "user" | "admin", c?: "user" | "admin"): boolean {
     if (typeof a != "string" && b && typeof b != "string") { // Middleware
         var request = a, response = b, userOrAdmin = c ? c : "user";

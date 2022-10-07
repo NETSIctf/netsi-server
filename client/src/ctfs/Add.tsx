@@ -36,11 +36,7 @@ export default function Add() {
         console.log("Invalid name");
         setError("Invalid name. Names must be a letter or a number.");
       }
-      else if (reject.response.data.includes("Name too long")) {
-        console.log(reject.response.data);
-        setError(reject.response.data);
-      }
-      else if (reject.response.data.includes("Description too long")) {
+      else if (reject.response.data.includes("too long")) {
         console.log(reject.response.data);
         setError(reject.response.data);
       }

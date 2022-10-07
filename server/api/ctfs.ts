@@ -85,13 +85,6 @@ export default function ctf() {
     router.post("/add", (req, res) => {
         // adds a new ctf
         if (req.check_auth("admin")) {
-            // check if name is valid (only contains letters and numbers)
-            if (req.body.name.match(/^[a-zA-Z0-9]+$/) === null) {
-                res.status(400);
-                res.end("Invalid name");
-                return;
-            }
-
             db.run("INSERT INTO ctfs (name, description, start, end) VALUES (?, ?, ?, ?)", [req.body.name, req.body.description, req.body.start, req.body.end], function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
@@ -173,9 +166,7 @@ export default function ctf() {
                     return;
                 }
 
-                console.log(row)
                 let members = row.members.split(",");
-                console.log(members);
 
                 if (members.includes(username)) {
                     res.status(409);
