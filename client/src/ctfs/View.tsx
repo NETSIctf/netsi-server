@@ -141,10 +141,11 @@ export default function View() {
             })}
           </div>
           <p className={`mt-3`}>Challenges:</p>
-          <div className={`list-group`}>
+          <a className={`btn btn-primary`} href={`/ctfs/${ctfName}/addChallenge`}>Add Challenge</a>
+          <div className={`list-group mt-3`}>
             {ctf.challenges.length === 0 ? <div className={`list-group-item list-group-item-action dark-list-group-item`}>none</div> : ctf.challenges.map((challenge, index) => {
               return (
-                <div className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >
+                <div className={`list-group-item list-group-item-action dark-list-group-item mt-4`} key={index} >
                   <h3 className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.name}</h3>
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>

@@ -52,28 +52,28 @@ export default function Add() {
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
         <div className={`mt-2`} >
             <h2>Add CTF:</h2>
-          </div>
-          <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
-            {error}
-            <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
-          </div>
-          <div className={`mt-2`} >
-            <Form.Control type="text" placeholder="Title" value={title} onChange={event => SetCTFTitle(event.target.value)} />
-          </div>
-          <div className={`mt-2`} >
-            <Form.Control as="textarea" placeholder="Description" value={description} onChange={event => SetCTFDescription(event.target.value)} />
-          </div>
-          Start Date:
-          <div className={`mt-2`} >
-            <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
-          </div>
-          End Date:
-          <div className={`mt-2`} >
-            <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
-          </div>
-          <div className={`mt-2`} >
-            <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
-          </div>
+        </div>
+        <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
+          {error}
+          <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
+        </div>
+        <div className={`mt-2`} >
+          <Form.Control type="text" placeholder="Title" value={title} onChange={event => SetCTFTitle(event.target.value)} />
+        </div>
+        <div className={`mt-2`} >
+          <Form.Control as="textarea" placeholder="Description" value={description} onChange={event => SetCTFDescription(event.target.value)} />
+        </div>
+        Start Date:
+        <div className={`mt-2`} >
+          <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
+        </div>
+        End Date:
+        <div className={`mt-2`} >
+          <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
+        </div>
+        <div className={`mt-2`} >
+          <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
+        </div>
       </div>
     </div>
   )

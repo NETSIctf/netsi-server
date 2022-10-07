@@ -198,6 +198,11 @@ export default function ctf() {
                     res.end("ctf not found");
                     return;
                 }
+                if (req.body.points.match(/^[0-9]+$/) == null) {
+                    res.status(400);
+                    res.end("invalid points, must be a number");
+                    return;
+                }
                 db.run("INSERT INTO challenges (ctf_id, name, description, points) VALUES (?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points], (err) => {
                     if (err) {
                         if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
@@ -210,7 +215,7 @@ export default function ctf() {
                             return;
                         } else if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
                             res.status(400);
-                            res.end("Points must be greater than 0");
+                            res.end("Points must be greater or equal to 0");
                             return;
                         }
                         console.error(err);
@@ -308,24 +313,23 @@ export default function ctf() {
                 }
                 row.username = req.cookies.username;
 
-                db.get("SELECT * FROM challenges WHERE ctf_id = ?", [row.id], (err, row2) => {
+                db.all("SELECT name, description, points, solved_by FROM challenges WHERE ctf_id = ?", [row.id], (err, rows) => {
+                    console.log(rows);
+
                     if (err) {
                         console.error(err);
                         res.status(500);
                         res.end("server error");
                         return;
                     }
-                    if (row2 == undefined) {
+
+                    if (rows == undefined) {
                         row.challenges = [];
                     }
                     else {
-                        row.challenges = [row2];
+                        row.challenges = rows;
                     }
 
-                    for (let i = 0; i < row.challenges.length; i++) {
-                        delete row.challenges[i].id;
-                        delete row.challenges[i].ctf_id;
-                    }
                     res.status(200);
                     res.json(row);
                     return;
