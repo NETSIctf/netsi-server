@@ -24,6 +24,22 @@ db.run(`CREATE TABLE IF NOT EXISTS users(
     console.log("Initialized user DB");
 });
 
+function signToken(username: string, perms: "user" | "admin") {
+    return jwt.sign({ username: username, perms: perms }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" }
+}
+
+function getUser(username: string) {
+    return new Promise((resolve: (row: any) => void, reject: (err: Error) => void) => {
+        db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+
+            resolve(row);
+        })
+    })
+}
+
 export default function userApi(apis: Router) {
     apis.post("/login", async (req: Request, res: Response) => {
         const username: string = req.body?.username;
@@ -35,31 +51,25 @@ export default function userApi(apis: Router) {
             return false;
         }
 
-        if (sudoers.hasOwnProperty(username)) { // ADMIN
-            if (await bcrypt.compare(password, sudoers[username])) {
-                res.status(200);
-                res.cookie("token", jwt.sign({ username: username, perms: "admin" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                res.cookie("username", username, { httpOnly: false, secure: true, sameSite: "strict" })
-                res.end("success");
-            } else {
-                res.auth_fail();
-            }
-        } else { // NORMAL USER
-            db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                }
-                if (row && await bcrypt.compare(password, row.password)) {
-                    res.status(200);
-                    res.cookie("token", jwt.sign({ username: username, perms: "user" }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" })
-                    res.cookie("username", row.username, { httpOnly: false, secure: true, sameSite: "strict" })
-                    res.end("success");
-                } else {
-                    res.auth_fail();
-                }
-            });
+        var hash = "";
+        var type: Parameters<typeof signToken>[1] = "user";
+
+        if (sudoers.hasOwnProperty(username)) {
+            hash = sudoers[username];
+            type = "admin";
+        } else {
+            let user = await getUser(username);
+            hash = user.password;
+            type = "user";
+        }
+
+        if (await bcrypt.compare(password, hash)) {
+            res.status(200);
+            res.cookie("token", signToken(username, type));
+            res.cookie("username", username);
+            res.end("success");
+        } else {
+            res.auth_fail();
         }
     });
 
