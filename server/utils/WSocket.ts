@@ -8,7 +8,7 @@ export type messageListener = { message: string, handler: (msg: string, socket: 
 
 export default class WSocket {
     io: Server;
-    message: messageListener[] = new Array();
+    message: messageListener[] = [];
 
     constructor() {
         this.io = new Server();
@@ -19,7 +19,7 @@ export default class WSocket {
     #onConnection(socket: Socket) {
         let cookies = cookie.parse(socket.handshake.headers.cookie || "");
 
-        if (!cookies.token || !check_auth(cookies.token)) {
+        if (!cookies.token || !check_auth(cookies.token, cookies.perms == "admin" ? "admin" : "user")) {
             socket.emit("bad auth");
             socket.disconnect();
             return;
