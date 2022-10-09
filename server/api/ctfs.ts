@@ -145,7 +145,7 @@ export default function ctf() {
     router.post("/delete/:name", (req, res) => {
         // deletes a ctf
         if (req.check_auth("admin")) {
-            db.run("DELETE FROM ctfsoji WHERE name = ?", [req.params.name], (err) => {
+            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
                 if (serverErr(err, res)) return;
                 success(res); return;
             })
