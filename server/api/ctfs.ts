@@ -273,6 +273,41 @@ export default function ctf() {
         }
     })
 
+    router.post("/solveChal/:ctfName/:chalName", (req, res) => {
+        // solves a challenge
+        if (req.check_auth()) {
+            let username = req.cookies.username;
+            let ctfName = req.params.ctfName;
+            let chalName = req.params.chalName;
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500);
+                    res.end("server error");
+                    return;
+                }
+                if (!row) {
+                    res.status(404);
+                    res.end("ctf not found");
+                    return;
+                }
+
+                db.run("UPDATE challenges SET solved_by = ? WHERE ctf_id = ? AND name = ?", [username, row.id, chalName], (err) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(500);
+                        res.end("server error");
+                        return;
+                    }
+                    res.status(200);
+                    res.end("success");
+                    return;
+                })
+            })
+        }
+    })
+
     router.get("/list", (req, res) => {
         // lists all ctfs
         if (req.check_auth()) {

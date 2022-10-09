@@ -86,6 +86,23 @@ export default function View() {
     })
   }
 
+  function solve(challenge: string) {
+    // solves a challenge
+    axios.post("/api/ctfs/solveChal/" + ctfName + "/" + challenge).then(resolve => {
+      console.log(resolve);
+      if (resolve.status === 200) {
+        // success
+        window.location.reload();
+      }
+      else {
+        alert(resolve.status);
+      }
+    }).catch(reject => {
+      console.error(reject);
+      alert("Error Solving Challenge\n" + reject);
+    })
+  }
+
   useEffect(() => { // load the ctf
     axios.get(`/api/ctfs/${ctfName}`).then(result => {
       setStatus(result.status);
@@ -150,6 +167,7 @@ export default function View() {
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
+                  {challenge.solved_by ? "" : <button className={`btn btn-success`} onClick={() => solve(challenge.name)}>Mark as solved</button>}
                 </div>
               )
             })}
