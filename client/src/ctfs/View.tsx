@@ -30,6 +30,8 @@ export default function View() {
   const [deleting, setDeleting] = useState(false);
   const [joined, setJoined] = useState(false);
   const [isAdmin, setAdmin] = useState(false);
+  const [points, setPoints] = useState(0); // current CTF points
+  const [maxPoints, setMaxPoints] = useState(0); // max CTF points
 
   checkLoginNavigate();
 
@@ -99,7 +101,7 @@ export default function View() {
       }
     }).catch(reject => {
       console.error(reject);
-      alert("Error Solving Challenge\n" + reject);
+      alert(reject.request.response);
     })
   }
 
@@ -119,6 +121,25 @@ export default function View() {
         // if there are no members, display none
         result.data.members = ['none'];
       }
+
+      // calculate and set the points
+      let points = 0;
+      for (let i = 0; i < result.data.challenges.length; i++) {
+        // add the points of each challenge if it is solved
+        if (result.data.challenges[i].solved_by) {
+          points += result.data.challenges[i].points;
+        }
+      }
+
+      setPoints(points);
+
+      // set the max points
+      let maxPoints = 0;
+      for (let i = 0; i < result.data.challenges.length; i++) {
+        maxPoints += result.data.challenges[i].points;
+      }
+
+      setMaxPoints(maxPoints);
 
       setCtf(result.data);
     }).catch((reject: AxiosError) => {
@@ -149,6 +170,7 @@ export default function View() {
           <p>{ctf.description}</p>
           <p>Start: {ctf.start}</p>
           <p>End: {ctf.end}</p>
+          <p>{points}/{maxPoints} Points</p>
           <p>Members:</p>
           <div className={`list-group`}>
             {ctf.members.map((member, index) => {

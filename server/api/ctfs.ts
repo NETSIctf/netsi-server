@@ -32,7 +32,7 @@ db.run(`CREATE TABLE IF NOT EXISTS ctfs(
 db.run(`CREATE TABLE IF NOT EXISTS challenges(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ctf_id INTEGER NOT NULL,
-    name TEXT NOT NULL UNIQUE CHECK(length(name) < ${maxNameLength + 1}),
+    name TEXT NOT NULL CHECK(length(name) < ${maxNameLength + 1}),
     description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}),
     points INTEGER NOT NULL CHECK(points >= 0),
     solved_by TEXT,
@@ -264,10 +264,17 @@ export default function ctf() {
             let ctfName = req.params.ctfName;
             let chalName = req.params.chalName;
 
-            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+            db.get("SELECT id, members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
 
                 if (CTFNotFoundErr(row, res)) return;
+
+                // do not mark as solved if the user is not in ctf
+                if (!row.members || !row.members.split(",").includes(username)) {
+                    res.status(403);
+                    res.end("You must be in the ctf to solve challenges");
+                    return;
+                }
 
                 db.run("UPDATE challenges SET solved_by = ? WHERE ctf_id = ? AND name = ?", [username, row.id, chalName], (err) => {
                     if (serverErr(err, res)) return;

@@ -26,7 +26,7 @@ export default function List() {
         <div className={`list-group`} >
           {ctfs.map((ctf, index) => {
             return (
-              <Link to={`/ctfs/${ctf.name}`} className={`list-group-item list-group-item-action dark-list-group-item`} key={index} >{ctf.name}</Link>
+              <Link to={`/ctfs/${ctf.name}`} className={`list-group-item list-group-item-action dark-list-group-item dark-list-group-item-hover`} key={index} >{ctf.name}</Link>
             )
           })}
         </div>

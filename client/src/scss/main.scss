@@ -43,6 +43,11 @@ body, html, #root {
 }
 
 .dark-list-group-item:hover {
+    background-color: $primary;
+    color: $light;
+}
+
+.dark-list-group-item-hover:hover {
     background-color: $secondary;
     color: $light;
 }
