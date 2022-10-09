@@ -82,6 +82,36 @@ export default function ctf() {
         return returnVal;
     }
 
+    function serverErr(err: Error | null, res: any) {
+        // handle server errors
+        if (err) {
+            console.error(err);
+            res.status(500)
+            res.end("server error");
+            return true;
+        }
+
+        return false;
+    }
+
+    function CTFNotFoundErr(row: any, res: any) {
+        // handle ctf not found errors
+        if (!row) {
+            res.status(404);
+            res.end("ctf not found");
+            return true;
+        }
+
+        return false;
+    }
+
+    function success(res: any) {
+        // handle success
+        res.status(200);
+        res.end("success");
+        return true;
+    }
+
     router.post("/add", (req, res) => {
         // adds a new ctf
         if (req.check_auth("admin")) {
@@ -102,14 +132,12 @@ export default function ctf() {
                         res.end(`Description too long, max ${maxDescriptionLength} characters`);
                         return;
                     }
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    throw err;
+                    else {
+                        serverErr(err, res);
+                        return;
+                    }
                 }
-                res.status(200);
-                res.end("success");
-                return;
+                success(res); return;
             })
         }
     })
@@ -117,16 +145,9 @@ export default function ctf() {
     router.post("/delete/:name", (req, res) => {
         // deletes a ctf
         if (req.check_auth("admin")) {
-            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-                res.status(200);
-                res.end("success");
-                return;
+            db.run("DELETE FROM ctfsoji WHERE name = ?", [req.params.name], (err) => {
+                if (serverErr(err, res)) return;
+                success(res); return;
             })
         }
     })
@@ -137,31 +158,14 @@ export default function ctf() {
             let username = req.cookies.username;
             let ctfName = req.params.ctfName;
             db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-
-                if (!row) {
-                    res.status(404);
-                    res.end("ctf not found");
-                    return;
-                }
+                if (serverErr(err, res)) return;
+                if (CTFNotFoundErr(row, res)) return;
 
                 if (row.members == null) {
                     db.run("UPDATE ctfs SET members = ? WHERE name = ?", [username, ctfName], (err) => {
-                        if (err) {
-                            console.error(err);
-                            res.status(500);
-                            res.end("server error");
-                            return;
-                        }
+                        if (serverErr(err, res)) return;
                         console.log("added member to ctf");
-                        res.status(200);
-                        res.end("success");
-                        return;
+                        success(res); return;
                     })
                     return;
                 }
@@ -187,17 +191,10 @@ export default function ctf() {
         if (req.check_auth()) {
             let ctfName = req.params.ctfName;
             db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-                if (!row) {
-                    res.status(404);
-                    res.end("ctf not found");
-                    return;
-                }
+                if (serverErr(err, res)) return;
+
+                if (CTFNotFoundErr(row, res)) return;
+
                 if (req.body.points.match(/^[0-9]+$/) == null) {
                     res.status(400);
                     res.end("invalid points, must be a number");
@@ -218,14 +215,10 @@ export default function ctf() {
                             res.end("Points must be greater or equal to 0");
                             return;
                         }
-                        console.error(err);
-                        res.status(500);
-                        res.end("server error");
+                        serverErr(err, res);
                         return;
                     }
-                    res.status(200);
-                    res.end("success");
-                    return;
+                    success(res); return;
                 })
             })
         }
@@ -238,20 +231,11 @@ export default function ctf() {
             let username = req.cookies.username;
             let ctfName = req.params.ctfName;
             db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
+                if (serverErr(err, res)) return;
 
-                if (!row) {
-                    res.status(404);
-                    res.end("ctf not found");
-                    return;
-                }
+                if (CTFNotFoundErr(row, res)) return;
 
-                if (row.members == null) {
+                if (!row.members) {
                     res.status(404);
                     res.end("user not in ctf");
                     return;
@@ -281,28 +265,13 @@ export default function ctf() {
             let chalName = req.params.chalName;
 
             db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-                if (!row) {
-                    res.status(404);
-                    res.end("ctf not found");
-                    return;
-                }
+                if (serverErr(err, res)) return;
+
+                if (CTFNotFoundErr(row, res)) return;
 
                 db.run("UPDATE challenges SET solved_by = ? WHERE ctf_id = ? AND name = ?", [username, row.id, chalName], (err) => {
-                    if (err) {
-                        console.error(err);
-                        res.status(500);
-                        res.end("server error");
-                        return;
-                    }
-                    res.status(200);
-                    res.end("success");
-                    return;
+                    if (serverErr(err, res)) return;
+                    success(res); return;
                 })
             })
         }
@@ -312,12 +281,7 @@ export default function ctf() {
         // lists all ctfs
         if (req.check_auth()) {
             db.all("SELECT name FROM ctfs", [], (err, rows) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
+                if (serverErr(err, res)) return;
                 res.status(200);
                 res.json(rows);
                 return;
@@ -329,17 +293,9 @@ export default function ctf() {
         // gets info about a ctf
         if (req.check_auth()) {
             db.get("SELECT * FROM ctfs WHERE name = ?", [req.params.name], (err, row) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500);
-                    res.end("server error");
-                    return;
-                }
-                if (row == undefined) {
-                    res.status(404);
-                    res.end("ctf not found");
-                    return;
-                }
+                if (serverErr(err, res)) return;
+                if (CTFNotFoundErr(row, res)) return;
+
                 if (row.members == null) {
                     row.members = [];
                 }
@@ -351,12 +307,7 @@ export default function ctf() {
                 db.all("SELECT name, description, points, solved_by FROM challenges WHERE ctf_id = ?", [row.id], (err, rows) => {
                     console.log(rows);
 
-                    if (err) {
-                        console.error(err);
-                        res.status(500);
-                        res.end("server error");
-                        return;
-                    }
+                    if(serverErr(err, res)) return;
 
                     if (rows == undefined) {
                         row.challenges = [];
