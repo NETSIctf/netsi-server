@@ -25,7 +25,7 @@ db.run(`CREATE TABLE IF NOT EXISTS users(
 });
 
 function signToken(username: string, perms: "user" | "admin") {
-    return jwt.sign({ username: username, perms: perms }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" }), { httpOnly: true, secure: true, sameSite: "strict" }
+    return jwt.sign({ username: username, perms: perms }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" });
 }
 
 function getUser(username: string) {
@@ -70,7 +70,7 @@ export default function userApi(apis: Router) {
 
         if (await bcrypt.compare(password, hash)) {
             res.status(200);
-            res.cookie("token", signToken(username, type));
+            res.cookie("token", signToken(username, type), { httpOnly: true, secure: true, sameSite: "strict" });
             res.cookie("username", username);
             res.end("success");
         } else {
@@ -133,7 +133,7 @@ export default function userApi(apis: Router) {
                 } else {
                     console.log(`Created User ${req.body.username}`);
                     res.status(200);
-                    res.cookie("token", signToken(username, "user"));
+                    res.cookie("token", signToken(username, "user"), { httpOnly: true, secure: true, sameSite: "strict" });
                     res.end("success");
                     return;
                 }
