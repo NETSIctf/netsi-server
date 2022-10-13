@@ -39,6 +39,7 @@ export default function View() {
   const ctfName = params.ctfId;
 
   function deleteCTF() {// deletes a CTF from the database
+    if (!confirm("Are you sure you want to delete this CTF?")) return; // confirm deletion
     setDeleting(true);
     axios.post("/api/ctfs/delete/" + ctfName).then(resolve => {
       setDeleting(false);
