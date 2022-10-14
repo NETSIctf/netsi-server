@@ -96,6 +96,13 @@ export default function userApi(apis: Router) {
         return;
     });
 
+    apis.get("/username", (req, res) => {
+        if (req.check_auth()) {
+            res.status(200);
+            res.end(req.cookies.username);
+        }
+    });
+
     apis.post("/create", (req, res) => {
         console.log(`CREATE new user ${req.body.username}`);
 

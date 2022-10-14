@@ -32,11 +32,20 @@ export default function View() {
   const [isAdmin, setAdmin] = useState(false);
   const [points, setPoints] = useState(0); // current CTF points
   const [maxPoints, setMaxPoints] = useState(0); // max CTF points
+  const [username, setUsername] = useState(""); // current user's username
 
   checkLoginNavigate();
 
   // get the ctf name from the url
   const ctfName = params.ctfId;
+
+  useEffect(() => {
+    axios.get("/api/username").then(resolve => {
+      setUsername(resolve.data);
+    }).catch(reject => {
+      console.error(reject);
+    })
+  });
 
   function deleteCTF() {// deletes a CTF from the database
     if (!confirm("Are you sure you want to delete this CTF?")) return; // confirm deletion
@@ -89,9 +98,9 @@ export default function View() {
     })
   }
 
-  function solve(challenge: string) {
+  function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
-    axios.post("/api/ctfs/solveChal/" + ctfName + "/" + challenge).then(resolve => {
+    axios.post(`/api/ctfs/${isSolved ? "unsolveChal": "solveChal"}/${ctfName}/${challenge}`).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
@@ -190,7 +199,7 @@ export default function View() {
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
-                  {challenge.solved_by ? "" : <button className={`btn btn-success`} onClick={() => solve(challenge.name)}>Mark as solved</button>}
+                  {challenge.solved_by ? (challenge.solved_by == username || isAdmin ? <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button> : "") : <button className={`btn btn-success`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>}
                 </div>
               )
             })}

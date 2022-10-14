@@ -27,8 +27,8 @@ function createCtfsTable() {
 
     let columns: string[] = [
         `description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1})`,
-        `start DATE NOT NULL DEFAULT DATE('now')`,
-        `end DATE NOT NULL DEFAULT DATE('now')`,
+        `start DATE NOT NULL DEFAULT (DATE('now'))`,
+        `end DATE NOT NULL DEFAULT (DATE('now'))`,
         `members TEXT`
     ]
 
@@ -38,7 +38,7 @@ function createCtfsTable() {
                 if (err.message.includes("duplicate column name")) {
                     return;
                 }
-                console.error(err.message);
+                console.error(err.message, column);
             }
         });
     }
@@ -65,6 +65,9 @@ function createChallengesTable() {
                     return;
                 }
                 console.error(err.message, column);
+            }
+            else {
+                console.log("Added column", column);
             }
         });
     }
@@ -132,6 +135,17 @@ export default function ctf() {
         if (!row) {
             res.status(404);
             res.end("ctf not found");
+            return true;
+        }
+
+        return false;
+    }
+
+    function challengeNotFoundErr(row: any, res: any) {
+        // handle challenge not found errors
+        if (!row) {
+            res.status(404);
+            res.end("challenge not found");
             return true;
         }
 
@@ -309,7 +323,46 @@ export default function ctf() {
                     return;
                 }
 
+                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [row.id, chalName], (err, row) => {
+                    if (serverErr(err, res)) return;
+
+                    if (challengeNotFoundErr(row, res)) return;
+                })
+
                 db.run("UPDATE challenges SET solved_by = ? WHERE ctf_id = ? AND name = ?", [username, row.id, chalName], (err) => {
+                    if (serverErr(err, res)) return;
+                    success(res); return;
+                })
+            })
+        }
+    })
+
+    router.post("/unsolveChal/:ctfName/:chalName", (req, res) => {
+        // unsolves a challenge
+        // I probably could've put both of these in one func but I wrote this afterwards and im lazy
+        if (req.check_auth()) {
+            let username = req.cookies.username;
+            let ctfName = req.params.ctfName;
+            let chalName = req.params.chalName;
+
+            db.get("SELECT id, members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
+                if (serverErr(err, res)) return;
+
+                if (CTFNotFoundErr(row, res)) return;
+
+                db.get("SELECT solved_by FROM challenges WHERE ctf_id = ? AND name = ?", [row.id, chalName], (err, row) => {
+                    if (serverErr(err, res)) return;
+
+                    if (challengeNotFoundErr(row, res)) return;
+
+                    if (row.solved_by != username && !req.check_auth("admin")) {
+                        res.status(403);
+                        res.end("You did not solve this challenge and you are not an admin");
+                        return;
+                    }
+                })
+
+                db.run("UPDATE challenges SET solved_by = NULL WHERE ctf_id = ? AND name = ?", [row.id, chalName], (err) => {
                     if (serverErr(err, res)) return;
                     success(res); return;
                 })
