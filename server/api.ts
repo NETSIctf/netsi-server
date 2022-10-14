@@ -16,7 +16,7 @@ export default function apis(socketManager: WSocket) {
 
     router.get("/status", (req, res) => {
         res.status(200);
-        res.end("NETSI");
+        res.end("NETSI API is running");
     });
 
     return router;
