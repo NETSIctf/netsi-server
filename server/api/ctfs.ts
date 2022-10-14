@@ -42,6 +42,8 @@ function createCtfsTable() {
             }
         });
     }
+
+    console.log("Initialized ctfs table");
 }
 
 function createChallengesTable() {
@@ -66,9 +68,6 @@ function createChallengesTable() {
                 }
                 console.error(err.message, column);
             }
-            else {
-                console.log("Added column", column);
-            }
         });
     }
 
@@ -76,6 +75,8 @@ function createChallengesTable() {
     db.run(`ALTER TABLE challenges ADD FOREIGN KEY (ctf_id) REFERENCES ctfs(id)`, () => {
         // ignore errors because the foreign key might already exist
     });
+
+    console.log("Initialized challenges table");
 }
 
 createCtfsTable();
