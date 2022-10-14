@@ -188,6 +188,10 @@ export default function ctf() {
                 success(res); return;
             })
         }
+        else {
+            res.status(401);
+            res.end("bad auth");
+        }
     })
 
     router.post("/delete/:name", (req, res) => {

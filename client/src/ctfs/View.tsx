@@ -1,4 +1,4 @@
-import { checkLoginNavigate } from "../components/LoginChecks";
+import {checkAdmin, checkLoginNavigate} from "../components/LoginChecks";
 import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
@@ -156,20 +156,7 @@ export default function View() {
       setStatus(reject.response?.status || 500);
     })
 
-    axios.get("/api/login", { params: { admin: true } })
-      .then(resolve => {
-        if (resolve.status == 200) {
-          setAdmin(true);
-        } else {
-          setAdmin(false);
-        }
-      }).catch((err: AxiosError) => {
-        if (err.response?.status == 500) {
-          window.alert("500 ISE while attempting to auth");
-        } else {
-          setAdmin(false);
-        }
-      })
+    checkAdmin([setAdmin]);
   }, [])
 
   switch (status) {

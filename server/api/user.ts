@@ -79,8 +79,8 @@ export default function userApi(apis: Router) {
             return false;
         }
 
-        var hash = "";
-        var type: Parameters<typeof signToken>[1] = "user";
+        let hash;
+        let type: Parameters<typeof signToken>[1];
 
         if (sudoers.hasOwnProperty(username)) {
             hash = sudoers[username];
