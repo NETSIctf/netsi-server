@@ -24,17 +24,13 @@ export default function Add() {
       if (resolve.status === 200) {
         // success
         console.log("success");
-        navigate("/ctfs/" + title);
+        navigate(`/ctfs/view?title=${encodeURIComponent(title)}`);
       }
     }).catch(reject => {
       console.error(reject);
       if (reject.response.data == "ctf already exists") {
         console.log("ctf already exists");
         setError("CTF already exists");
-      }
-      else if (reject.response.data == "Invalid name") {
-        console.log("Invalid name");
-        setError("Invalid name. Names must be a letter or a number.");
       }
       else if (reject.response.data.includes("too long")) {
         console.log(reject.response.data);

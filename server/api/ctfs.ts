@@ -194,21 +194,21 @@ export default function ctf() {
         }
     })
 
-    router.post("/delete/:name", (req, res) => {
+    router.post("/delete", (req, res) => {
         // deletes a ctf
         if (req.check_auth("admin")) {
-            db.run("DELETE FROM ctfs WHERE name = ?", [req.params.name], (err) => {
+            db.run("DELETE FROM ctfs WHERE name = ?", [req.body.title as string], (err) => {
                 if (serverErr(err, res)) return;
                 success(res); return;
             })
         }
     })
 
-    router.post("/addMember/:ctfName", (req, res) => {
+    router.post("/addMember", (req, res) => {
         // adds member to ctf
         if (req.check_auth()) {
             let username = req.cookies.username;
-            let ctfName = req.params.ctfName;
+            let ctfName = req.body.title as string;
             db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
                 if (CTFNotFoundErr(row, res)) return;
@@ -239,9 +239,9 @@ export default function ctf() {
         }
     })
 
-    router.post("/addChallenge/:ctfName", (req, res) => {
+    router.post("/addChallenge", (req, res) => {
         if (req.check_auth()) {
-            let ctfName = req.params.ctfName;
+            let ctfName = req.body.title as string;
             db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
 
@@ -266,6 +266,10 @@ export default function ctf() {
                             res.status(400);
                             res.end("Points must be greater or equal to 0");
                             return;
+                        } else if (err.message.includes(`UNIQUE constraint failed`)) {
+                            res.status(409);
+                            res.end("Challenge already exists");
+                            return;
                         }
                         serverErr(err, res);
                         return;
@@ -276,12 +280,11 @@ export default function ctf() {
         }
     })
 
-
-    router.post("/removeMember/:ctfName", (req, res) => {
+    router.post("/removeMember", (req, res) => {
         // removes member from ctf
         if (req.check_auth()) {
             let username = req.cookies.username;
-            let ctfName = req.params.ctfName;
+            let ctfName = req.body.title as string;
             db.get("SELECT members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
 
@@ -309,12 +312,12 @@ export default function ctf() {
         }
     })
 
-    router.post("/solveChal/:ctfName/:chalName", (req, res) => {
+    router.post("/solveChal", (req, res) => {
         // solves a challenge
         if (req.check_auth()) {
             let username = req.cookies.username;
-            let ctfName = req.params.ctfName;
-            let chalName = req.params.chalName;
+            let ctfName = req.body.title as string;
+            let chalName = req.body.chalTitle as string;
 
             db.get("SELECT id, members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
@@ -342,13 +345,13 @@ export default function ctf() {
         }
     })
 
-    router.post("/unsolveChal/:ctfName/:chalName", (req, res) => {
+    router.post("/unsolveChal", (req, res) => {
         // unsolves a challenge
         // I probably could've put both of these in one func but I wrote this afterwards and im lazy
         if (req.check_auth()) {
             let username = req.cookies.username;
-            let ctfName = req.params.ctfName;
-            let chalName = req.params.chalName;
+            let ctfName = req.body.title as string;
+            let chalName = req.body.chalTitle as string;
 
             db.get("SELECT id, members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
@@ -387,10 +390,11 @@ export default function ctf() {
         }
     })
 
-    router.get("/:name", (req, res) => {
+    router.get("/view", (req, res) => {
         // gets info about a ctf
+        let ctfName = decodeURIComponent(req.query.title as string);
         if (req.check_auth()) {
-            db.get("SELECT * FROM ctfs WHERE name = ?", [req.params.name], (err, row) => {
+            db.get("SELECT * FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
                 if (CTFNotFoundErr(row, res)) return;
 

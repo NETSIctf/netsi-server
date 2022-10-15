@@ -9,8 +9,8 @@ export default function Index() {
         <Routes>
             <Route index element={<List />} />
             <Route path="add" element={<Add />} />
-            <Route path=":ctfId" element={<View />} />
-            <Route path=":ctfId/addChallenge" element={<AddChallenge />} />
+            <Route path="view" element={<View />} />
+            <Route path="addChallenge" element={<AddChallenge />} />
         </Routes>
     )
 }

@@ -2,7 +2,7 @@ import {checkAdmin, checkLoginNavigate} from "../components/LoginChecks";
 import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type challenge = {
   name: string,
@@ -22,7 +22,7 @@ type ctfData = {
 
 export default function View() {
   const navigate = useNavigate();
-  const params = useParams();
+  const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string); // name of ctf from query
 
   const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [], challenges: [] });
   const [status, setStatus] = useState<number>(200);
@@ -36,21 +36,10 @@ export default function View() {
 
   checkLoginNavigate();
 
-  // get the ctf name from the url
-  const ctfName = params.ctfId;
-
-  useEffect(() => {
-    axios.get("/api/username").then(resolve => {
-      setUsername(resolve.data);
-    }).catch(reject => {
-      console.error(reject);
-    })
-  });
-
   function deleteCTF() {// deletes a CTF from the database
     if (!confirm("Are you sure you want to delete this CTF?")) return; // confirm deletion
     setDeleting(true);
-    axios.post("/api/ctfs/delete/" + ctfName).then(resolve => {
+    axios.post(`/api/ctfs/delete`, {"title" : ctfName}).then(resolve => {
       setDeleting(false);
       if (resolve.status === 200) {
         // success
@@ -67,7 +56,7 @@ export default function View() {
   function addMember() {
     setJoining(true);
     // adds a member to the CTF
-    axios.post("/api/ctfs/addMember/" + ctfName).then(resolve => {
+    axios.post(`/api/ctfs/addMember`, {"title":ctfName}).then(resolve => {
       setJoining(false);
       console.log(resolve);
       if (resolve.status === 200) {
@@ -84,7 +73,7 @@ export default function View() {
   function removeMember() {
     setJoining(true);
     // removes a member from the CTF
-    axios.post("/api/ctfs/removeMember/" + ctfName).then(resolve => {
+    axios.post(`/api/ctfs/removeMember`, {"title" : ctfName}).then(resolve => {
       setJoining(false);
       console.log(resolve);
       if (resolve.status === 200) {
@@ -100,7 +89,10 @@ export default function View() {
 
   function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
-    axios.post(`/api/ctfs/${isSolved ? "unsolveChal": "solveChal"}/${ctfName}/${challenge}`).then(resolve => {
+    axios.post(`/api/ctfs/${isSolved ? "unsolveChal": "solveChal"}`, {
+      "title": ctfName,
+      "chalTitle": challenge
+    }).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
@@ -116,7 +108,13 @@ export default function View() {
   }
 
   useEffect(() => { // load the ctf
-    axios.get(`/api/ctfs/${ctfName}`).then(result => {
+    axios.get("/api/username").then(resolve => {
+      setUsername(resolve.data);
+    }).catch(reject => {
+      console.error(reject);
+    })
+
+    axios.get(`/api/ctfs/view?title=${encodeURIComponent(ctfName)}`).then(result => {
       setStatus(result.status);
 
       // properly display the date
@@ -177,7 +175,7 @@ export default function View() {
             })}
           </div>
           <p className={`mt-3`}>Challenges:</p>
-          <a className={`btn btn-primary`} href={`/ctfs/${ctfName}/addChallenge`}>Add Challenge</a>
+          <a className={`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}`}>Add Challenge</a>
           <div className={`list-group mt-3`}>
             {ctf.challenges.length === 0 ? <div className={`list-group-item list-group-item-action dark-list-group-item`}>none</div> : ctf.challenges.map((challenge, index) => {
               return (

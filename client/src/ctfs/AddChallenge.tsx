@@ -2,7 +2,7 @@ import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios";
 import { useState } from "react";
 import { Form, Button } from 'react-bootstrap';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AddChallenge() {
   let navigate = useNavigate();
@@ -13,11 +13,12 @@ export default function AddChallenge() {
   const [description, SetDescription] = useState("");
   const [points, SetPoints] = useState("");
 
-  const ctfName = useParams().ctfId;
+  const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string);
 
   function addChallenge() {
     // adds a challenge to the database
-    axios.post("/api/ctfs/addChallenge/" + ctfName, {
+    axios.post("/api/ctfs/addChallenge/", {
+      title: ctfName,
       name: name,
       description: description,
       points: points
@@ -25,7 +26,7 @@ export default function AddChallenge() {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
-        navigate("/ctfs/" + ctfName);
+        navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`);
       }
     }).catch(reject => {
       console.error(reject);
@@ -55,7 +56,7 @@ export default function AddChallenge() {
         <Button variant="primary" onClick={() => addChallenge()}>Add Challenge</Button>
       </div>
       <div className={`mt-2`} >
-        <Button variant="secondary" onClick={() => navigate("/ctfs/" + ctfName)}>Cancel</Button>
+        <Button variant="secondary" onClick={() => navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`)}>Cancel</Button>
       </div>
     </div>
   )
