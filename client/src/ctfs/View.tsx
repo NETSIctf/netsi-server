@@ -183,6 +183,7 @@ export default function View() {
                   <h3 className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.name}</h3>
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
+                  <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
                   { challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
                     <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button>
