@@ -184,7 +184,7 @@ export default function View() {
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
-                  { challenge.solved_by == username || isAdmin ?
+                  { challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
                     <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button>
                   :
                     joined ?
