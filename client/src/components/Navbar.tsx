@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import BsNavbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
 import { checkLogin } from "./LoginChecks";
 
 function Navbar() {
@@ -19,15 +20,13 @@ function Navbar() {
   }, [pathname]);
 
   return (
-    <BsNavbar variant="dark" bg="dark" expand="lg" className="text-light" >
+    <BsNavbar variant="dark" bg="dark" className="text-light" >
       <div className="container-fluid">
         <BsNavbar.Brand href="/" >NETSI</BsNavbar.Brand>
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <Link className="nav-link" to="/webshell">Webshell</Link>
-            <Link className="nav-link" to="/ctfs">CTFs</Link>
-          </ul>
-        </div>
+        <Nav className="me-auto">
+          <Nav.Link href="/webshell">Webshell</Nav.Link>
+          <Nav.Link href="/ctfs">CTFs</Nav.Link>
+        </Nav>
 
         {login}
       </div>
