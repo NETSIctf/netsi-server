@@ -2,7 +2,7 @@ import express from "express";
 
 import userApi from "./api/user";
 import monitorApi from "./api/monitor";
-import ctfRouter from "./api/ctfs";
+import ctfRouter from "./api/ctfs/ctfs";
 import WSocket from "./utils/WSocket";
 
 export default function apis(socketManager: WSocket) {

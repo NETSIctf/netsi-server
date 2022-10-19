@@ -1,6 +1,8 @@
 import { Router } from "express";
-
 import sqlite3 from "sqlite3";
+
+import createTables from "./createTables";
+import { updateMembers, serverErr, CTFNotFoundErr, challengeNotFoundErr, success } from "./utils";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
     if (err) {
@@ -12,153 +14,10 @@ const db = new sqlite3.Database("ctf.db", (err) => {
 const maxNameLength = 64;
 const maxDescriptionLength = 1024;
 
-/*
-  To add a new column to a table, add the column to the columns array.
-  If the column has to be UNIQUE, you will have to reset the DB or manually add the UNIQUE constraint.
-  If the column has the NOT NULL constraint, you will have to set a default value, manually add the constraint and fill the values, or reset the DB.
- */
-
-function createCtfsTable() {
-    // create ctfs table if it doesn't exist
-    db.run(`CREATE TABLE IF NOT EXISTS ctfs(id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE CHECK(length(name) < ${maxNameLength +1}))`);
-
-    let alter: string = `ALTER TABLE ctfs ADD COLUMN`
-
-    let columns: string[] = [
-        `description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1})`,
-        `start DATE NOT NULL DEFAULT (DATE('now'))`,
-        `end DATE NOT NULL DEFAULT (DATE('now'))`,
-        `members TEXT`
-    ]
-
-    for (let column of columns) {
-        db.run(`${alter} ${column}`, (err) => {
-            if (err) {
-                if (err.message.includes("duplicate column name")) {
-                    return;
-                }
-                console.error(err.message, column);
-            }
-        });
-    }
-
-    console.log("Initialized ctfs table");
-}
-
-function createChallengesTable() {
-    // create challenges table if it doesn't exist
-    db.run(`CREATE TABLE IF NOT EXISTS challenges(id INTEGER PRIMARY KEY AUTOINCREMENT)`);
-
-    let alter: string = `ALTER TABLE challenges ADD COLUMN`
-
-    let columns = [
-        `name TEXT NOT NULL CHECK(length(name) < ${maxNameLength + 1})`,
-        `ctf_id INTEGER NOT NULL`,
-        `description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}) DEFAULT "default"`,
-        `points INTEGER NOT NULL CHECK(points >= 0) DEFAULT 0`,
-        `solved_by TEXT`
-    ]
-
-    for (let column of columns) {
-        db.run(`${alter} ${column};`, (err) => {
-            if (err) {
-                if (err.message.includes("duplicate column name")) {
-                    return;
-                }
-                console.error(err.message, column);
-            }
-        });
-    }
-
-    // create foreign key
-    db.run(`ALTER TABLE challenges ADD FOREIGN KEY (ctf_id) REFERENCES ctfs(id)`, () => {
-        // ignore errors because the foreign key might already exist
-    });
-
-    console.log("Initialized challenges table");
-}
-
-createCtfsTable();
-createChallengesTable();
+createTables("all");
 
 export default function ctf() {
     const router = Router();
-
-    function updateMembers(members:string[], ctfName: string): [number, string]{
-        /*
-            update members in db
-            args: members: string[], ctfName: string - members to update, ctf name
-            returns: [number, string] - [status code, message]
-        */
-
-        let returnVal: [number, string] = [200, "success"];
-        db.run("UPDATE ctfs SET members = ? WHERE name = ?", [members.join(","), ctfName], (err) => {
-            if (err) {
-                console.error(err);
-                returnVal = [500, "server error"];
-                return;
-            }
-            returnVal = [200, "success"];
-            return;
-        })
-
-        // if members are empty, set members to null
-        if (members.length === 0) {
-            db.run("UPDATE ctfs SET members = ? WHERE name = ?", [null, ctfName], (err) => {
-                if (err) {
-                    console.error(err);
-                    returnVal = [500, "server error"];
-                    return;
-                }
-                returnVal = [200, "success"];
-                return;
-            })
-        }
-
-        return returnVal;
-    }
-
-    function serverErr(err: Error | null, res: any) {
-        // handle server errors
-        if (err) {
-            console.error(err);
-            res.status(500)
-            res.end("server error");
-            return true;
-        }
-
-        return false;
-    }
-
-    function CTFNotFoundErr(row: any, res: any) {
-        // handle ctf not found errors
-        if (!row) {
-            res.status(404);
-            res.end("ctf not found");
-            return true;
-        }
-
-        return false;
-    }
-
-    function challengeNotFoundErr(row: any, res: any) {
-        // handle challenge not found errors
-        if (!row) {
-            res.status(404);
-            res.end("challenge not found");
-            return true;
-        }
-
-        return false;
-    }
-
-    function success(res: any) {
-        // handle success
-        res.status(200);
-        res.end("success");
-        return true;
-    }
 
     router.post("/add", (req, res) => {
         // adds a new ctf
@@ -216,7 +75,6 @@ export default function ctf() {
                 if (row.members == null) {
                     db.run("UPDATE ctfs SET members = ? WHERE name = ?", [username, ctfName], (err) => {
                         if (serverErr(err, res)) return;
-                        console.log("added member to ctf");
                         success(res); return;
                     })
                     return;
@@ -231,7 +89,7 @@ export default function ctf() {
                 }
 
                 members.push(username);
-                let [status, message] = updateMembers(members, ctfName);
+                let [status, message] = updateMembers(members, ctfName, db);
                 res.status(status);
                 res.end(message);
             })
@@ -253,15 +111,10 @@ export default function ctf() {
                     return;
                 }
 
-                db.get(`SELECT id FROM challenges WHERE name = ? AND ctf_id = ?`, [req.body.name, row.id], (err, row) => {
-                    if (err) {
-                        console.error(err);
-                        res.status(500);
-                        res.end("server error");
-                        return;
-                    }
+                db.get(`SELECT id FROM challenges WHERE name = ? AND ctf_id = ?`, [req.body.name, row.id], (err, ids) => {
+                    if (serverErr(err, res)) return;
 
-                    if (row) {
+                    if (ids) {
                         res.status(409);
                         res.end("challenge already exists");
                         return;
@@ -285,6 +138,7 @@ export default function ctf() {
                             serverErr(err, res);
                             return;
                         }
+
                         success(res); return;
                     })
                 });
@@ -317,7 +171,7 @@ export default function ctf() {
                 }
 
                 members.splice(members.indexOf(username), 1);
-                let [status, message] = updateMembers(members, ctfName);
+                let [status, message] = updateMembers(members, ctfName, db);
                 res.status(status);
                 res.end(message);
             })
@@ -419,14 +273,11 @@ export default function ctf() {
                 row.username = req.cookies.username;
 
                 db.all("SELECT name, description, points, solved_by FROM challenges WHERE ctf_id = ?", [row.id], (err, rows) => {
-                    console.log(rows);
-
                     if(serverErr(err, res)) return;
 
                     if (rows == undefined) {
                         row.challenges = [];
-                    }
-                    else {
+                    } else {
                         row.challenges = rows;
                     }
 
