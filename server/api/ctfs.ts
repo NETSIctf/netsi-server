@@ -48,12 +48,12 @@ function createCtfsTable() {
 
 function createChallengesTable() {
     // create challenges table if it doesn't exist
-    db.run(`CREATE TABLE IF NOT EXISTS challenges(id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        name TEXT NOT NULL UNIQUE CHECK(length(name) < ${maxNameLength + 1}))`);
+    db.run(`CREATE TABLE IF NOT EXISTS challenges(id INTEGER PRIMARY KEY AUTOINCREMENT)`);
 
     let alter: string = `ALTER TABLE challenges ADD COLUMN`
 
     let columns = [
+        `name TEXT NOT NULL CHECK(length(name) < ${maxNameLength + 1})`,
         `ctf_id INTEGER NOT NULL`,
         `description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}) DEFAULT "default"`,
         `points INTEGER NOT NULL CHECK(points >= 0) DEFAULT 0`,
@@ -252,30 +252,42 @@ export default function ctf() {
                     res.end("invalid points, must be a number");
                     return;
                 }
-                db.run("INSERT INTO challenges (ctf_id, name, description, points) VALUES (?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points], (err) => {
+
+                db.get(`SELECT id FROM challenges WHERE name = ? AND ctf_id = ?`, [req.body.name, row.id], (err, row) => {
                     if (err) {
-                        if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
-                            res.status(400);
-                            res.end(`Name too long, max ${maxNameLength} characters`);
-                            return;
-                        } else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
-                            res.status(400);
-                            res.end(`Description too long, max ${maxDescriptionLength} characters`);
-                            return;
-                        } else if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
-                            res.status(400);
-                            res.end("Points must be greater or equal to 0");
-                            return;
-                        } else if (err.message.includes(`UNIQUE constraint failed`)) {
-                            res.status(409);
-                            res.end("Challenge already exists");
-                            return;
-                        }
-                        serverErr(err, res);
+                        console.error(err);
+                        res.status(500);
+                        res.end("server error");
                         return;
                     }
-                    success(res); return;
-                })
+
+                    if (row) {
+                        res.status(409);
+                        res.end("challenge already exists");
+                        return;
+                    }
+
+                    db.run("INSERT INTO challenges (ctf_id, name, description, points) VALUES (?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points], (err) => {
+                        if (err) {
+                            if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
+                                res.status(400);
+                                res.end(`Name too long, max ${maxNameLength} characters`);
+                                return;
+                            } else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
+                                res.status(400);
+                                res.end(`Description too long, max ${maxDescriptionLength} characters`);
+                                return;
+                            } else if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
+                                res.status(400);
+                                res.end("Points must be greater or equal to 0");
+                                return;
+                            }
+                            serverErr(err, res);
+                            return;
+                        }
+                        success(res); return;
+                    })
+                });
             })
         }
     })
