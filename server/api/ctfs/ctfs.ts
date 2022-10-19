@@ -244,6 +244,33 @@ export default function ctf() {
         }
     })
 
+    router.post("/deleteChal", (req, res) => {
+        // deletes a challenge if you are an admin
+        if (req.check_auth("admin")) {
+            let ctfName = req.body.title as string;
+            let chalName = req.body.chalTitle as string;
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, chalName], (err, challengeID) => {
+                    if (challengeNotFoundErr(challengeID, res)) return;
+
+                    if (serverErr(err, res)) return;
+
+                    db.run("DELETE FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, chalName], (err) => {
+                        if (serverErr(err, res)) return;
+
+                        success(res); return;
+                    })
+                })
+
+            })
+        }
+    })
+
     router.get("/list", (req, res) => {
         // lists all ctfs
         if (req.check_auth()) {

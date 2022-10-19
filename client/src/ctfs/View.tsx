@@ -107,6 +107,26 @@ export default function View() {
     })
   }
 
+  function deleteChallenge(challenge: string) {
+    // deletes a challenge
+    if (!confirm("Are you sure you want to delete this challenge?")) return; // confirm deletion
+    axios.post(`/api/ctfs/deleteChal`, {
+      "title": ctfName,
+      "chalTitle": challenge
+    }).then(resolve => {
+      if (resolve.status === 200) {
+        // success
+        window.location.reload();
+      }
+      else {
+        alert(resolve.status);
+      }
+    }).catch(reject => {
+      console.error(reject);
+      alert(reject.request.response);
+    })
+  }
+
   useEffect(() => { // load the ctf
     axios.get("/api/username").then(resolve => {
       setUsername(resolve.data);
@@ -185,12 +205,13 @@ export default function View() {
                   <p>Points: {challenge.points}</p>
                   <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
-                  { challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
+                  <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
                     <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button>
                   :
                     joined ?
                       <button className={`btn btn-success`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
-                    : "" }
+                      : "" }</div>
+                  {isAdmin ? <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button> : ""}
                 </div>
               )
             })}
