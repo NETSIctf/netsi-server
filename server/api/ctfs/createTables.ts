@@ -56,7 +56,8 @@ export default function createTables(table: string) {
       `ctf_id INTEGER NOT NULL`,
       `description TEXT NOT NULL CHECK(length(description) < ${maxDescriptionLength + 1}) DEFAULT "default"`,
       `points INTEGER NOT NULL CHECK(points >= 0) DEFAULT 0`,
-      `solved_by TEXT`
+      `solved_by TEXT`,
+      `flag TEXT`,
     ]
 
     for (let column of columns) {

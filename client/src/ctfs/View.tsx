@@ -3,12 +3,14 @@ import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useLocation } from "react-router-dom";
+import { Form } from "react-bootstrap";
 
 type challenge = {
   name: string,
   description: string,
   points: number,
-  solved_by: string
+  solved_by: string,
+  flag: string,
 }
 
 type ctfData = {
@@ -32,7 +34,9 @@ export default function View() {
   const [isAdmin, setAdmin] = useState(false);
   const [points, setPoints] = useState(0); // current CTF points
   const [maxPoints, setMaxPoints] = useState(0); // max CTF points
-  const [username, setUsername] = useState(""); // current user's username
+  const [username, setUsername] = useState("");
+  const [flag, setFlag] = useState(""); // flag to submit
+  const [solveChalError, setSolveChalError] = useState("");
 
   checkLoginNavigate();
 
@@ -91,7 +95,8 @@ export default function View() {
     // solves a challenge
     axios.post(`/api/ctfs/${isSolved ? "unsolveChal": "solveChal"}`, {
       "title": ctfName,
-      "chalTitle": challenge
+      "chalTitle": challenge,
+      "flag": flag,
     }).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
@@ -99,11 +104,12 @@ export default function View() {
         window.location.reload();
       }
       else {
-        alert(resolve.status);
+        console.error(resolve);
+        setSolveChalError(resolve.data);
       }
     }).catch(reject => {
       console.error(reject);
-      alert(reject.request.response);
+      setSolveChalError(reject.response.data);
     })
   }
 
@@ -205,11 +211,20 @@ export default function View() {
                   <p>Points: {challenge.points}</p>
                   <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
+
+                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChalError == "" ?  "none" : "block show"}`} role="alert" >
+                    {solveChalError}
+                    <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSolveChalError("")} />
+                  </div>
+                  { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
                   <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
                     <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button>
                   :
                     joined ?
-                      <button className={`btn btn-success`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
+                      <div>
+                        <Form.Control type={`text`} placeholder={`Flag`} className={`mt-3`} onChange={(e) => setFlag(e.target.value)} />
+                        <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
+                      </div>
                       : "" }</div>
                   {isAdmin ? <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button> : ""}
                 </div>

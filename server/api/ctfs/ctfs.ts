@@ -184,6 +184,13 @@ export default function ctf() {
             let username = req.cookies.username;
             let ctfName = req.body.title as string;
             let chalName = req.body.chalTitle as string;
+            let flag = req.body.flag as string;
+
+            if (flag.length <= 0) {
+                res.status(400);
+                res.end("Provide a flag");
+                return;
+            }
 
             db.get("SELECT id, members FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
                 if (serverErr(err, res)) return;
@@ -203,7 +210,7 @@ export default function ctf() {
                     if (challengeNotFoundErr(row, res)) return;
                 })
 
-                db.run("UPDATE challenges SET solved_by = ? WHERE ctf_id = ? AND name = ?", [username, row.id, chalName], (err) => {
+                db.run("UPDATE challenges SET solved_by = ?, flag = ? WHERE ctf_id = ? AND name = ?", [username, flag, row.id, chalName], (err) => {
                     if (serverErr(err, res)) return;
                     success(res); return;
                 })
@@ -236,7 +243,7 @@ export default function ctf() {
                     }
                 })
 
-                db.run("UPDATE challenges SET solved_by = NULL WHERE ctf_id = ? AND name = ?", [row.id, chalName], (err) => {
+                db.run("UPDATE challenges SET solved_by = NULL, flag = NULL WHERE ctf_id = ? AND name = ?", [row.id, chalName], (err) => {
                     if (serverErr(err, res)) return;
                     success(res); return;
                 })
@@ -299,7 +306,7 @@ export default function ctf() {
                 }
                 row.username = req.cookies.username;
 
-                db.all("SELECT name, description, points, solved_by FROM challenges WHERE ctf_id = ?", [row.id], (err, rows) => {
+                db.all("SELECT name, description, points, flag, solved_by FROM challenges WHERE ctf_id = ?", [row.id], (err, rows) => {
                     if(serverErr(err, res)) return;
 
                     if (rows == undefined) {
