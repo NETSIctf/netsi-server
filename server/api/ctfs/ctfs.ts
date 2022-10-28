@@ -278,6 +278,37 @@ export default function ctf() {
         }
     })
 
+    router.post("/updateWriteup", (req, res) => {
+        // updates the writeup for a challenge
+        if (req.check_auth("admin")) {
+            let ctfName = req.body.title as string;
+            let chalName = req.body.chalTitle as string;
+            let writeup = req.body.writeup as string;
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, chalName], (err, challengeID) => {
+                    if (challengeNotFoundErr(challengeID, res)) return;
+
+                    if (serverErr(err, res)) return;
+
+                    db.run("UPDATE challenges SET writeup = ? WHERE ctf_id = ? AND name = ?", [writeup, ctfID.id, chalName], (err) => {
+                        if (serverErr(err, res)) return;
+
+                        success(res); return;
+                    })
+                })
+            })
+        } else {
+            res.status(403);
+            res.end("You are not an admin");
+            return;
+        }
+    })
+
     router.get("/list", (req, res) => {
         // lists all ctfs
         if (req.check_auth()) {

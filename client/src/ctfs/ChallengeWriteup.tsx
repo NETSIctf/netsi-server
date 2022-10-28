@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import MDEditor from '@uiw/react-md-editor';
 import { Button } from "react-bootstrap";
+import axios from "axios";
 
 
 export default function ChallengeWriteup() {
@@ -14,6 +15,19 @@ export default function ChallengeWriteup() {
 
   const [writeup, setWriteup] = useState(`# ${ctfName} - ${challengeName} Writeup`);
   const [isAdmin , setAdmin] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  function saveWriteup() {
+    axios.post("/api/ctfs/updateWriteup", {title: ctfName, chalTitle: challengeName, writeup: writeup}).then(resolve => {
+      if (resolve.status === 200) {
+        setSuccess("Writeup saved successfully");
+      }
+    }).catch(reject => {
+      console.error(reject);
+      setError(reject.response.data);
+    })
+  }
 
   useEffect(() => {
     checkAdmin([setAdmin]);
@@ -29,8 +43,19 @@ export default function ChallengeWriteup() {
             value={writeup}
             onChange={(value) => setWriteup(value as string)}
           />
+          <div className={`mt-2 d-flex flex-column justify-content-center align-items-center`}>
+            <div className={`alert alert-danger alert-dismissible rounded d-${error == "" ?  "none" : "block show"}`}>
+              {error}
+              <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
+            </div>
+            <div className={`alert alert-success alert-dismissible rounded d-${success == "" ?  "none" : "block show"}`}>
+              {success}
+              <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSuccess("")} />
+            </div>
+          </div>
+
           <div className={`text-center mt-2`}>
-            <Button variant="success">Save</Button>
+            <Button variant="success" onClick={ saveWriteup }>Save</Button>
           </div>
           <div className={`mt-2 text-center`} >
             <Button variant="secondary" onClick={() => navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`)}>Cancel</Button>

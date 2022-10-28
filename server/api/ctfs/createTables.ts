@@ -58,6 +58,7 @@ export default function createTables(table: string) {
       `points INTEGER NOT NULL CHECK(points >= 0) DEFAULT 0`,
       `solved_by TEXT`,
       `flag TEXT`,
+      `writeup TEXT NOT NULL DEFAULT "default"`,
     ]
 
     for (let column of columns) {
