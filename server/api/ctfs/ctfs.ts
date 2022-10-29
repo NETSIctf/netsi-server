@@ -120,7 +120,9 @@ export default function ctf() {
                         return;
                     }
 
-                    db.run("INSERT INTO challenges (ctf_id, name, description, points) VALUES (?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points], (err) => {
+                    let writeup = `# ${ctfName} - ${req.body.name}`;
+
+                    db.run("INSERT INTO challenges (ctf_id, name, description, points, writeup) VALUES (?, ?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points, writeup], (err) => {
                         if (err) {
                             if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
                                 res.status(400);
@@ -345,6 +347,30 @@ export default function ctf() {
                     } else {
                         row.challenges = rows;
                     }
+
+                    res.status(200);
+                    res.json(row);
+                    return;
+                })
+            })
+        }
+    })
+
+    router.get("/writeup", (req, res) => {
+        // get the writeup for a challenge
+        if (req.check_auth()) {
+            let ctfName = decodeURIComponent(req.query.title as string);
+            let chalName = decodeURIComponent(req.query.challenge as string);
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.get("SELECT writeup FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, chalName], (err, row) => {
+                    if (challengeNotFoundErr(row, res)) return;
+
+                    if (serverErr(err, res)) return;
 
                     res.status(200);
                     res.json(row);

@@ -13,7 +13,7 @@ export default function ChallengeWriteup() {
   const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string); // name of ctf from query
   const challengeName = decodeURIComponent(new URLSearchParams(useLocation().search).get("challenge") as string); // name of challenge from query
 
-  const [writeup, setWriteup] = useState(`# ${ctfName} - ${challengeName} Writeup`);
+  const [writeup, setWriteup] = useState("");
   const [isAdmin , setAdmin] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -31,7 +31,20 @@ export default function ChallengeWriteup() {
 
   useEffect(() => {
     checkAdmin([setAdmin]);
-  })
+
+    axios.get(`/api/ctfs/writeup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challengeName)}`).then(resolve => {
+      if (resolve.status === 200) {
+        setWriteup(resolve.data.writeup);
+      }
+      else {
+        console.error(resolve);
+        alert("Error getting writeup" + resolve);
+      }
+    }).catch(reject => {
+      console.error(reject);
+      alert("Error getting writeup\n" + reject);
+    })
+  }, [])
 
   return (
     <div>
@@ -40,7 +53,7 @@ export default function ChallengeWriteup() {
         <div>
           <MDEditor
             height={500}
-            value={writeup}
+            value={ writeup }
             onChange={(value) => setWriteup(value as string)}
           />
           <div className={`mt-2 d-flex flex-column justify-content-center align-items-center`}>
