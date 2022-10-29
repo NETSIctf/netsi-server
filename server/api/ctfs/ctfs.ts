@@ -56,7 +56,20 @@ export default function ctf() {
     router.post("/delete", (req, res) => {
         // deletes a ctf
         if (req.check_auth("admin")) {
-            db.run("DELETE FROM ctfs WHERE name = ?", [req.body.title as string], (err) => {
+            let ctfName = req.body.title as string;
+            // delete challenges in the ctf
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.run("DELETE FROM challenges WHERE ctf_id = ?", [ctfID.id], (err) => {
+                    if (serverErr(err, res)) return;
+                })
+            })
+
+            // delete the ctf
+            db.run("DELETE FROM ctfs WHERE name = ?", [ctfName], (err) => {
                 if (serverErr(err, res)) return;
                 success(res); return;
             })
