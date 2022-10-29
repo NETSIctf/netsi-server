@@ -4,29 +4,22 @@ import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
 import { useNavigate, useLocation } from "react-router-dom";
 import { Form } from "react-bootstrap";
-
-type challenge = {
-  name: string,
-  description: string,
-  points: number,
-  solved_by: string,
-  flag: string,
-}
-
-type ctfData = {
-  name: string,
-  description: string,
-  start: string,
-  end: string,
-  members: string[],
-  challenges: challenge[],
-}
+import { ctfData } from "./Types";
+import { parseDate } from "./Utils";
 
 export default function View() {
   const navigate = useNavigate();
   const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string); // name of ctf from query
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [], challenges: [] });
+  const [ctf, setCtf] = useState<ctfData>({
+    name: "Loading...",
+    description: "",
+    start: "",
+    end: "",
+    members: [],
+    challenges: []
+  });
+
   const [status, setStatus] = useState<number>(200);
   const [joining, setJoining] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -36,7 +29,7 @@ export default function View() {
   const [maxPoints, setMaxPoints] = useState(0); // max CTF points
   const [username, setUsername] = useState("");
   const [flag, setFlag] = useState(""); // flag to submit
-  const [solveChalError, setSolveChalError] = useState("");
+  const [solveChallengeError, setSolveChallengeError] = useState("");
 
   checkLoginNavigate();
 
@@ -105,11 +98,11 @@ export default function View() {
       }
       else {
         console.error(resolve);
-        setSolveChalError(resolve.data);
+        setSolveChallengeError(resolve.data);
       }
     }).catch(reject => {
       console.error(reject);
-      setSolveChalError(reject.response.data);
+      setSolveChallengeError(reject.response.data);
     })
   }
 
@@ -144,8 +137,8 @@ export default function View() {
       setStatus(result.status);
 
       // properly display the date
-      result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
-      result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
+      result.data.start = parseDate(result.data.start);
+      result.data.end = parseDate(result.data.end);
 
       if (result.data.members.includes(result.data.username)) {
         setJoined(true);
@@ -212,9 +205,9 @@ export default function View() {
                   <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
                   <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
 
-                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChalError == "" ?  "none" : "block show"}`} role="alert" >
-                    {solveChalError}
-                    <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSolveChalError("")} />
+                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChallengeError == "" ?  "none" : "block show"}`} role="alert" >
+                    {solveChallengeError}
+                    <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSolveChallengeError("")} />
                   </div>
                   { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
                   <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?

@@ -14,7 +14,6 @@ export default function List() {
       setCtfs(result.data);
     }).catch(reject => {
       console.log(reject);
-      setCtfs([]);
     })
 
     checkAdmin([setAdmin]);
