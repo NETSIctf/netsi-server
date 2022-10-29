@@ -26,23 +26,24 @@ export default function ctf() {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
                         res.status(409);
-                        res.end("ctf already exists");
+                        res.end("CTF already exists");
                         return;
                     }
-                    else if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
+
+                    if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
                         res.status(400);
-                        res.end(`Name too long, max ${maxNameLength} characters`);
+                        res.end(`Name cannot be greater than ${maxNameLength} characters`);
                         return;
                     }
-                    else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
+
+                    if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
                         res.status(400);
-                        res.end(`Description too long, max ${maxDescriptionLength} characters`);
+                        res.end(`Description cannot be greater than ${maxDescriptionLength} characters`);
                         return;
                     }
-                    else {
-                        serverErr(err, res);
-                        return;
-                    }
+
+                    serverErr(err, res);
+                    return;
                 }
                 success(res); return;
             })

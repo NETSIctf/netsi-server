@@ -28,18 +28,7 @@ export default function Add() {
       }
     }).catch(reject => {
       console.error(reject);
-      if (reject.response.data == "ctf already exists") {
-        console.log("ctf already exists");
-        setError("CTF already exists");
-      }
-      else if (reject.response.data.includes("too long")) {
-        console.log(reject.response.data);
-        setError(reject.response.data);
-      }
-      else {
-        console.log("Error adding CTF");
-        setError("Error adding CTF, please try again later.");
-      }
+      setError(reject.response.data);
     })
   }
 
