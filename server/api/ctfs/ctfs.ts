@@ -2,7 +2,7 @@ import { Router } from "express";
 import sqlite3 from "sqlite3";
 
 import createTables from "./createTables";
-import { updateMembers, serverErr, CTFNotFoundErr, challengeNotFoundErr, success } from "./utils";
+import { updateMembers, serverErr, CTFNotFoundErr, challengeNotFoundErr, success, nameTooLongErr, descriptionTooLongErr } from "./utils";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
     if (err) {
@@ -10,9 +10,6 @@ const db = new sqlite3.Database("ctf.db", (err) => {
     }
     console.log("Connected to the database.");
 });
-
-const maxNameLength = 64;
-const maxDescriptionLength = 1024;
 
 createTables("all");
 
@@ -30,19 +27,12 @@ export default function ctf() {
                         return;
                     }
 
-                    if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
-                        res.status(400);
-                        res.end(`Name cannot be greater than ${maxNameLength} characters`);
-                        return;
-                    }
+                    if (nameTooLongErr(err, res)) return;
 
-                    if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
-                        res.status(400);
-                        res.end(`Description cannot be greater than ${maxDescriptionLength} characters`);
-                        return;
-                    }
+                    if (descriptionTooLongErr(err, res)) return;
 
                     serverErr(err, res);
+
                     return;
                 }
                 success(res); return;
@@ -138,15 +128,11 @@ export default function ctf() {
 
                     db.run("INSERT INTO challenges (ctf_id, name, description, points, writeup) VALUES (?, ?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points, writeup], (err) => {
                         if (err) {
-                            if (err.message.includes(`CHECK constraint failed: length(name) < ${maxNameLength + 1}`)) {
-                                res.status(400);
-                                res.end(`Name too long, max ${maxNameLength} characters`);
-                                return;
-                            } else if (err.message.includes(`CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`)) {
-                                res.status(400);
-                                res.end(`Description too long, max ${maxDescriptionLength} characters`);
-                                return;
-                            } else if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
+                            if (nameTooLongErr(err, res)) return;
+
+                            if (descriptionTooLongErr(err, res)) return;
+
+                            if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
                                 res.status(400);
                                 res.end("Points must be greater or equal to 0");
                                 return;
@@ -236,7 +222,7 @@ export default function ctf() {
 
     router.post("/unsolveChal", (req, res) => {
         // unsolves a challenge
-        // I probably could've put both of these in one func but I wrote this afterwards and im lazy
+        // I probably could've put both of these in one func, but I wrote this afterwards and im lazy
         if (req.check_auth()) {
             let username = req.cookies.username;
             let ctfName = req.body.title as string;

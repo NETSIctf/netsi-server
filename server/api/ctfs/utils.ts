@@ -68,6 +68,28 @@ export function challengeNotFoundErr(row: any, res: any) {
   return false;
 }
 
+export function nameTooLongErr(err: any, res: any) {
+  const maxNameLength = 64;
+  if (err.message == `CHECK constraint failed: length(name) < ${maxNameLength + 1}`) {
+    res.status(400);
+    res.end(`Name cannot be greater than ${maxNameLength} characters`);
+    return true;
+  }
+
+  return false;
+}
+
+export function descriptionTooLongErr(err: any, res: any) {
+  const maxDescriptionLength = 1024;
+  if (err.message == `CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`) {
+    res.status(400);
+    res.end(`Description cannot be greater than ${maxDescriptionLength} characters`);
+    return true;
+  }
+
+  return false;
+}
+
 export function success(res: any) {
   // handle success
   res.status(200);
