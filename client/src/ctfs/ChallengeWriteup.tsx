@@ -29,6 +29,10 @@ export default function ChallengeWriteup() {
     })
   }
 
+  function returnToChallenge() {
+    navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`);
+  }
+
   useEffect(() => {
     checkAdmin([setAdmin]);
 
@@ -67,13 +71,19 @@ export default function ChallengeWriteup() {
             </div>
           </div>
 
+          <div className={`mt-2 text-center`} >
+            <Button variant="secondary" onClick={ returnToChallenge }>Cancel</Button>
+          </div>
+
           <div className={`text-center mt-2`}>
             <Button variant="success" onClick={ saveWriteup }>Save</Button>
           </div>
-          <div className={`mt-2 text-center`} >
-            <Button variant="secondary" onClick={() => navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`)}>Cancel</Button>
+
+          <div className={`text-center mt-2`}>
+            <Button variant={`success`} onClick={ () => { saveWriteup(); returnToChallenge() } }>Save and exit</Button>
           </div>
         </div>
+
 
         : <div>
           <MDEditor.Markdown source={writeup} />
