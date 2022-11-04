@@ -219,13 +219,20 @@ export default function View() {
                         <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
                       </div>
                       : "" }</div>
-                  {isAdmin ? <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button> : ""}
+                  <div>
+                    <a className = {`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
+                  </div>
+                  {isAdmin ?
+                    <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button>
+                    : ""}
                 </div>
               )
             })}
           </div>
           {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
-          {isAdmin ? <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button> : null}
+          {isAdmin ?
+            <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button>
+            : null}
         </div>
       )
     case 404:

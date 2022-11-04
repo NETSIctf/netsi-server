@@ -2,7 +2,16 @@ import { Router } from "express";
 import sqlite3 from "sqlite3";
 
 import createTables from "./createTables";
-import { updateMembers, serverErr, CTFNotFoundErr, challengeNotFoundErr, success, nameTooLongErr, descriptionTooLongErr } from "./utils";
+import {
+    updateMembers,
+    serverErr,
+    CTFNotFoundErr,
+    challengeNotFoundErr,
+    success,
+    nameTooLongErr,
+    descriptionTooLongErr,
+    pointsMustBeGreaterThanZeroErr
+} from "./utils";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
     if (err) {
@@ -111,7 +120,7 @@ export default function ctf() {
 
                 if (req.body.points.match(/^[0-9]+$/) == null) {
                     res.status(400);
-                    res.end("invalid points, must be a number");
+                    res.end("Invalid points, must be a number");
                     return;
                 }
 
@@ -127,19 +136,13 @@ export default function ctf() {
                     let writeup = `# ${ctfName} - ${req.body.name}`;
 
                     db.run("INSERT INTO challenges (ctf_id, name, description, points, writeup) VALUES (?, ?, ?, ?, ?)", [row.id, req.body.name, req.body.description, req.body.points, writeup], (err) => {
-                        if (err) {
-                            if (nameTooLongErr(err, res)) return;
+                        if (nameTooLongErr(err, res)) return;
 
-                            if (descriptionTooLongErr(err, res)) return;
+                        if (descriptionTooLongErr(err, res)) return;
 
-                            if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
-                                res.status(400);
-                                res.end("Points must be greater or equal to 0");
-                                return;
-                            }
-                            serverErr(err, res);
-                            return;
-                        }
+                        if (pointsMustBeGreaterThanZeroErr(err, res)) return;
+
+                        if (serverErr(err, res)) return;
 
                         success(res); return;
                     })
@@ -311,6 +314,41 @@ export default function ctf() {
         }
     })
 
+    router.post("/editChallenge", (req, res) => {
+        // updates a challenge
+        if (req.check_auth("admin")) {
+            if (!req.body.points.match(/^[0-9]+$/)) {
+                res.status(400);
+                res.end("Points must be a number");
+                return;
+            }
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [req.body.title as string], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, req.body.name as string], (err, challengeID) => {
+                    if (challengeNotFoundErr(challengeID, res)) return;
+
+                    if (serverErr(err, res)) return;
+
+                    db.run("UPDATE challenges SET name = ?, description = ?, points = ? WHERE id = ?", [req.body.name, req.body.description, req.body.points, challengeID.id], (err) => {
+                        if (nameTooLongErr(err, res)) return;
+
+                        if (descriptionTooLongErr(err, res)) return;
+
+                        if (pointsMustBeGreaterThanZeroErr(err, res)) return;
+
+                        if (serverErr(err, res)) return;
+
+                        success(res); return;
+                    })
+                })
+            })
+        }
+    })
+
     router.get("/list", (req, res) => {
         // lists all ctfs
         if (req.check_auth()) {
@@ -368,6 +406,30 @@ export default function ctf() {
                 if (serverErr(err, res)) return;
 
                 db.get("SELECT writeup FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, chalName], (err, row) => {
+                    if (challengeNotFoundErr(row, res)) return;
+
+                    if (serverErr(err, res)) return;
+
+                    res.status(200);
+                    res.json(row);
+                    return;
+                })
+            })
+        }
+    })
+
+    router.get("/editChallenge", (req, res) => {
+        // gets basic info about a challenge for editing
+        if (req.check_auth("admin")) {
+            let ctfName = decodeURIComponent(req.query.title as string);
+            let challengeName = decodeURIComponent(req.query.name as string);
+
+            db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, ctfID) => {
+                if (CTFNotFoundErr(ctfID, res)) return;
+
+                if (serverErr(err, res)) return;
+
+                db.get("SELECT name, description, points FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, challengeName], (err, row) => {
                     if (challengeNotFoundErr(row, res)) return;
 
                     if (serverErr(err, res)) return;

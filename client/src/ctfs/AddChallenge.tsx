@@ -1,6 +1,6 @@
 import { checkLoginNavigate } from "../components/LoginChecks";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -14,10 +14,28 @@ export default function AddChallenge() {
   const [points, SetPoints] = useState("");
 
   const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string);
+  const isEdit = new URLSearchParams(useLocation().search).get("edit" as string) === "true";
+  const challengeName = decodeURIComponent(new URLSearchParams(useLocation().search).get("challenge" as string) as string);
+
+  useEffect(() => {
+    if (isEdit) {
+      axios.get(`/api/ctfs/editChallenge?title=${ctfName}&name=${ challengeName }`).then(resolve => {
+        if (resolve.status === 200) {
+          SetName(resolve.data.name);
+          SetDescription(resolve.data.description);
+          SetPoints(resolve.data.points.toString());
+        }
+      }).catch(reject => {
+        console.error(reject);
+        setError("Error getting challenge");
+      })
+    }
+  }, []);
 
   function addChallenge() {
-    // adds a challenge to the database
-    axios.post("/api/ctfs/addChallenge/", {
+    // Adds/edits a challenge, depending on isEdit
+    const url = isEdit ? "/api/ctfs/editChallenge" : "/api/ctfs/addChallenge";
+    axios.post(url, {
       title: ctfName,
       name: name,
       description: description,
@@ -37,7 +55,10 @@ export default function AddChallenge() {
   return (
     <div className={`d-flex flex-column justify-content-center align-items-center`}>
       <div className={`mt-2`} >
-        <h2>Add Challenge:</h2>
+        {isEdit ?
+          <h2>Edit Challenge</h2>
+          : <h2>Add Challenge:</h2>
+        }
       </div>
       <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
         {error}
@@ -53,7 +74,7 @@ export default function AddChallenge() {
         <Form.Control type="number" placeholder="Points" value={points} onChange={(event) => SetPoints(event.target.value)} />
       </div>
       <div className={`mt-2`} >
-        <Button variant="primary" onClick={() => addChallenge()}>Add Challenge</Button>
+          <Button variant="primary" onClick={ addChallenge }>{ isEdit ? "Edit Challenge" : "Add Challenge" }</Button>
       </div>
       <div className={`mt-2`} >
         <Button variant="secondary" onClick={() => navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`)}>Cancel</Button>
