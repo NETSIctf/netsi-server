@@ -19,7 +19,7 @@ export default function ChallengeWriteup() {
   const [success, setSuccess] = useState("");
 
   function saveWriteup() {
-    axios.post("/api/ctfs/updateWriteup", {title: ctfName, chalTitle: challengeName, writeup: writeup}).then(resolve => {
+    axios.post("/api/ctfs/updateWriteup", {title: ctfName, challengeTitle: challengeName, writeup: writeup}).then(resolve => {
       if (resolve.status === 200) {
         setSuccess("Writeup saved successfully");
       }

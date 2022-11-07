@@ -86,9 +86,9 @@ export default function View() {
 
   function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
-    axios.post(`/api/ctfs/${isSolved ? "unsolveChal": "solveChal"}`, {
+    axios.post(`/api/ctfs/${isSolved ? "unsolveChallenge": "solveChallenge"}`, {
       "title": ctfName,
-      "chalTitle": challenge,
+      "challengeTitle": challenge,
       "flag": flag,
     }).then(resolve => {
       console.log(resolve);
@@ -109,9 +109,9 @@ export default function View() {
   function deleteChallenge(challenge: string) {
     // deletes a challenge
     if (!confirm("Are you sure you want to delete this challenge?")) return; // confirm deletion
-    axios.post(`/api/ctfs/deleteChal`, {
+    axios.post(`/api/ctfs/deleteChallenge`, {
       "title": ctfName,
-      "chalTitle": challenge
+      "challengeTitle": challenge
     }).then(resolve => {
       if (resolve.status === 200) {
         // success
