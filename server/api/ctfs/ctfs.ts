@@ -10,7 +10,8 @@ import {
     success,
     nameTooLongErr,
     descriptionTooLongErr,
-    pointsMustBeGreaterThanZeroErr
+    pointsMustBeGreaterThanZeroErr,
+    pointsMustBeNumberErr,
 } from "./utils";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
@@ -317,11 +318,7 @@ export default function ctf() {
     router.post("/editChallenge", (req, res) => {
         // updates a challenge
         if (req.check_auth("admin")) {
-            if (!req.body.points.match(/^[0-9]+$/)) {
-                res.status(400);
-                res.end("Points must be a number");
-                return;
-            }
+            if (pointsMustBeNumberErr(req.body.points, res)) return;
 
             db.get("SELECT id FROM ctfs WHERE name = ?", [req.body.title as string], (err, ctfID) => {
                 if (CTFNotFoundErr(ctfID, res)) return;

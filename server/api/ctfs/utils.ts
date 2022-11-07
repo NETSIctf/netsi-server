@@ -70,38 +70,45 @@ export function challengeNotFoundErr(row: any, res: any) {
 
 export function nameTooLongErr(err: any, res: any) {
   const maxNameLength = 64;
-  /* TODO fix
-  if (err.message == `CHECK constraint failed: length(name) < ${maxNameLength + 1}`) {
+  if (err.message == `SQLITE_CONSTRAINT: CHECK constraint failed: length(name) < ${maxNameLength + 1}`) {
     res.status(400);
     res.end(`Name cannot be greater than ${maxNameLength} characters`);
     return true;
-  }*/
+  }
 
   return false;
 }
 
 export function descriptionTooLongErr(err: any, res: any) {
-  /* TODO fix
   const maxDescriptionLength = 1024;
-  console.log("DEBUG err message", err)
-  if (err.message == `CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`) {
+  if (err.message == `SQLITE_CONSTRAINT: CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`) {
     res.status(400);
     res.end(`Description cannot be greater than ${maxDescriptionLength} characters`);
     return true;
-  }*/
+  }
 
   return false;
 }
 
 export function pointsMustBeGreaterThanZeroErr(err: any, res: any) {
-  /* TODO fix
-  console.log("DEBUG err message", err);
-  if (err.message.includes(`CHECK constraint failed: points >= 0`)) {
+  if (err.message.includes(`SQLITE_CONSTRAINT: CHECK constraint failed: points >= 0`)) {
     res.status(400);
     res.end("Points must be greater or equal to 0");
     return true;
-  }*/
+  }
   return false
+}
+
+export function pointsMustBeNumberErr(points: string, res: any) {
+  try {
+    parseInt(points);
+  }
+  catch {
+    res.status(400);
+    res.end("Points must be a number");
+    return true;
+  }
+  return false;
 }
 
 export function success(res: any) {
