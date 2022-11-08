@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 export function checkLoginNavigate() {// checks if the user is logged in. If they are, it does nothing. If they are not, it redirects them to the login page.
   const navigate = useNavigate();
+  const url = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
   useEffect(() => {
     axios.get("/api/login").then(resolve => {
       if (resolve.status !== 200) {
-        navigate("/login");
+        navigate(url);
       }
     }).catch(() => {
-      navigate("/login");
+      navigate(url);
     })
   }, [])
 }

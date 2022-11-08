@@ -10,13 +10,18 @@ function Login() {
   const [newUser, setNewUser] = useState(false);
   const navigate = useNavigate();
 
+  let redirectURL = decodeURIComponent(new URLSearchParams(window.location.search).get("redirect") as string);
+  if (redirectURL === "null") {
+    redirectURL = "/";
+  }
+
   function login() {
     axios.post("/api/login", { username: username, password: password })
       .then(resolve => {
         if (resolve.status == 401) { // probably not needed
           setLoginFail(true);
         } else {
-          navigate("/");
+          navigate(redirectURL);
         }
       }).catch(reject => {
         if (reject.response.data == "bad auth") {
