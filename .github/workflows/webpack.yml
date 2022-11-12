@@ -27,6 +27,6 @@ jobs:
         cd client
         npm install
         npm run build
-        cd server
+        cd ../server
         npm install
         npm run build
