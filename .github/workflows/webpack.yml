@@ -39,6 +39,7 @@ jobs:
     
     - name: Commit Files
       run: |
+        rm .gitignore
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git commit -a -m "Add dist"
