@@ -27,13 +27,14 @@ jobs:
 
     - name: Build
       run: |
-        rm .gitignore
         cd client
-        npm install
-        npm run build
+        yarn install
+        yarn build
         cd ../server
-        npm install
-        npm run build
+        yarn install
+        yarn run build
+        mv dist ../serverbuild
+        mv ../client/dist ../clientbuild
     
     - name: Push Changes
       uses: ad-m/github-push-action@master
