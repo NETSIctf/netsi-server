@@ -34,8 +34,15 @@ jobs:
         yarn install
         yarn run build
         mv dist ../serverbuild
-        mv ../client/dist ../clientbuild
+        cd ..
+        mv client/dist ../clientbuild
     
+    - name: Commit Files
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git commit -a -m "Add dist"
+
     - name: Push Changes
       uses: ad-m/github-push-action@master
       with:
