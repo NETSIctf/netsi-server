@@ -69,6 +69,8 @@ export function challengeNotFoundErr(row: any, res: any) {
 }
 
 export function nameTooLongErr(err: any, res: any) {
+  if (!err) return false;
+
   const maxNameLength = 64;
   if (err.message == `SQLITE_CONSTRAINT: CHECK constraint failed: length(name) < ${maxNameLength + 1}`) {
     res.status(400);
@@ -80,6 +82,8 @@ export function nameTooLongErr(err: any, res: any) {
 }
 
 export function descriptionTooLongErr(err: any, res: any) {
+  if (!err) return false;
+
   const maxDescriptionLength = 1024;
   if (err.message == `SQLITE_CONSTRAINT: CHECK constraint failed: length(description) < ${maxDescriptionLength + 1}`) {
     res.status(400);
@@ -91,6 +95,8 @@ export function descriptionTooLongErr(err: any, res: any) {
 }
 
 export function pointsMustBeGreaterThanZeroErr(err: any, res: any) {
+  if (!err) return false;
+
   if (err.message.includes(`SQLITE_CONSTRAINT: CHECK constraint failed: points >= 0`)) {
     res.status(400);
     res.end("Points must be greater or equal to 0");
