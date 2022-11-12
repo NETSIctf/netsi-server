@@ -27,6 +27,7 @@ jobs:
 
     - name: Build
       run: |
+        rm .gitignore
         cd client
         npm install
         npm run build
