@@ -1,9 +1,7 @@
-name: NodeJS with Webpack
+name: NodeJS
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 jobs:
@@ -12,10 +10,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v3
+    with:
+      persist-credentials: false
+      fetch-depth: 0
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -25,8 +26,13 @@ jobs:
     - name: Build
       run: |
         cd client
-        npm install
-        npm run build
+        yarn install
+        yarn build
         cd ../server
-        npm install
-        npm run build
+        yarn install
+        yarn build
+    - name: Push Changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: deploy
