@@ -21,14 +21,14 @@ const db = new sqlite3.Database("user.db", (err) => {
 
 // create ctfs table if it doesn't exist
 function createUsersTable() {
-    db.run(`CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY  AUTOINCREMENT)`);
+    db.run(`CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY  AUTOINCREMENT,
+        uuid TEXT NOT NULL UNIQUE,
+        username TEXT NOT NULL UNIQUE)`);
 
     let alter: string = `ALTER TABLE users ADD COLUMN`;
 
     let columns: string[] = [
-        `uuid TEXT NOT NULL UNIQUE`,
-        `username TEXT NOT NULL UNIQUE`,
-        `password TEXT NOT NULL`,
+        `password TEXT NOT NULL`
     ];
 
     for (let column of columns) {
