@@ -13,39 +13,8 @@ const db = new sqlite3.Database("user.db", (err) => {
     console.log("Connected to the database.");
 });
 
-/*
-  To add a new column to a table, add the column to the columns array.
-  If the column has to be UNIQUE, you will have to reset the DB or manually add the UNIQUE constraint.
-  If the column has the NOT NULL constraint, you will have to set a default value, manually add the constraint and fill the values, or reset the DB.
- */
-
 // create ctfs table if it doesn't exist
-function createUsersTable() {
-    db.run(`CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY  AUTOINCREMENT)`);
-
-    let alter: string = `ALTER TABLE users ADD COLUMN`;
-
-    let columns: string[] = [
-        `uuid TEXT NOT NULL UNIQUE`,
-        `username TEXT NOT NULL UNIQUE`,
-        `password TEXT NOT NULL`,
-    ];
-
-    for (let column of columns) {
-        db.run(`${alter} ${column}`, (err) => {
-            if (err) {
-                if (err.message.includes("duplicate column name")) {
-                    return;
-                }
-                console.error(err.message, column);
-            }
-        });
-    }
-
-    console.log("Initialized user table");
-}
-
-createUsersTable();
+db.run(`CREATE TABLE IF NOT EXISTS users(uuid TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL)`);
 
 function signToken(username: string, perms: "user" | "admin") {
     return jwt.sign({ username: username, perms: perms }, process.env.jwt_secret + "", { algorithm: "HS256", expiresIn: "7d" });
