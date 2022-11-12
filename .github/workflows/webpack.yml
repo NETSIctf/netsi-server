@@ -33,9 +33,7 @@ jobs:
         cd ../server
         yarn install
         yarn run build
-        mv dist ../serverbuild
         cd ..
-        mv client/dist ../clientbuild
     
     - name: Commit Files
       run: |
