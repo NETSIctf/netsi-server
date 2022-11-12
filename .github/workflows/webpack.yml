@@ -37,8 +37,11 @@ jobs:
     
     - name: Commit Files
       run: |
-        rm .gitignore
-        git rm --cached -r *
+        mv ./server/dist ./serverbuild
+        mv ./client/dist ./clientbuild
+        rm -rf ./client
+        rm -rf ./server
+        git add *
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git commit -a -m "Add dist"
