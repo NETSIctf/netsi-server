@@ -23,6 +23,8 @@ export default function View() {
   const [status, setStatus] = useState<number>(200);
   const [joining, setJoining] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [solving, setSolving] = useState(false);
+  const [deletingChallenge, setDeletingChallenge] = useState(false);
   const [joined, setJoined] = useState(false);
   const [isAdmin, setAdmin] = useState(false);
   const [points, setPoints] = useState(0); // current CTF points
@@ -68,29 +70,31 @@ export default function View() {
   }
 
   function removeMember() {
-    setJoining(true);
     // removes a member from the CTF
+    setJoining(true);
     axios.post(`/api/ctfs/removeMember`, {"title" : ctfName}).then(resolve => {
-      setJoining(false);
       console.log(resolve);
+      setJoining(false);
       if (resolve.status === 200) {
         // success
         window.location.reload();
       }
     }).catch(reject => {
-      setJoining(false);
       console.error(reject);
+      setJoining(false);
       alert("Error Leaving CTF\n" + reject);
     })
   }
 
   function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
+    setSolving(true);
     axios.post(`/api/ctfs/${isSolved ? "unsolveChallenge": "solveChallenge"}`, {
       "title": ctfName,
       "challengeTitle": challenge,
       "flag": flag,
     }).then(resolve => {
+      setSolving(false);
       console.log(resolve);
       if (resolve.status === 200) {
         // success
@@ -101,6 +105,7 @@ export default function View() {
         setSolveChallengeError(resolve.data);
       }
     }).catch(reject => {
+      setSolving(false);
       console.error(reject);
       setSolveChallengeError(reject.response.data);
     })
@@ -108,11 +113,13 @@ export default function View() {
 
   function deleteChallenge(challenge: string) {
     // deletes a challenge
+    setDeletingChallenge(true);
     if (!confirm("Are you sure you want to delete this challenge?")) return; // confirm deletion
     axios.post(`/api/ctfs/deleteChallenge`, {
       "title": ctfName,
       "challengeTitle": challenge
     }).then(resolve => {
+      setDeletingChallenge(false);
       if (resolve.status === 200) {
         // success
         window.location.reload();
@@ -121,6 +128,7 @@ export default function View() {
         alert(resolve.status);
       }
     }).catch(reject => {
+      setDeletingChallenge(false);
       console.error(reject);
       alert(reject.request.response);
     })
@@ -211,12 +219,12 @@ export default function View() {
                   </div>
                   { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
                   <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
-                    <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )}>Mark as unsolved</button>
+                    <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )} disabled={solving}>{ solving ? "unsolving..." : "Mark as unsolved" }</button>
                   :
                     joined ?
                       <div>
                         <Form.Control type={`text`} placeholder={`Flag`} className={`mt-3`} onChange={(e) => setFlag(e.target.value)} />
-                        <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
+                        <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)} disabled={solving}>{ solving ? "Solving..." : "Mark as solved"}</button>
                       </div>
                       : "" }</div>
                   {isAdmin ?
@@ -225,7 +233,7 @@ export default function View() {
                         <a className = {`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
                       </div>
                       <div>
-                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button>
+                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)} disabled={ deletingChallenge }>{ deletingChallenge ? "Deleting..." : "Delete" }</button>
                       </div>
                     </div>
                     : ""}
@@ -233,7 +241,7 @@ export default function View() {
               )
             })}
           </div>
-          {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
+          {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? joined ? "Leaving..." : "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
           {isAdmin ?
             <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button>
             : null}
