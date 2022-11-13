@@ -12,10 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+        fetch-depth: 0
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -25,8 +28,27 @@ jobs:
     - name: Build
       run: |
         cd client
-        npm install
-        npm run build
+        yarn install
+        yarn build
         cd ../server
-        npm install
-        npm run build
+        yarn install
+        yarn run build
+        cd ..
+    
+    - name: Commit Files
+      run: |
+        mv ./server/dist ./serverbuild
+        mv ./client/dist ./clientbuild
+        rm -rf ./client
+        rm -rf ./server
+        git add *
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git commit -a -m "Add dist"
+
+    - name: Push Changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: deploy
+        force: true
