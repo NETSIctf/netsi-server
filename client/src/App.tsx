@@ -7,7 +7,7 @@ function App() {
   return (
     <div>
       <h1> NETSI MAIN PAGE </h1>
-      Fish is objectively bad, and this is objectively a test for our new deploy system
+      Fish is objectively bad, and this is objectively a test for some webhooks
     </div>
   )
 }
