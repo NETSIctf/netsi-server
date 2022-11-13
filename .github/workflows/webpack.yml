@@ -41,7 +41,7 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         rm .gitignore
-        git rm --cached -r *
+        git add -A
         git commit -a -m "Add Distribution files"
 
     - name: Push Changes
