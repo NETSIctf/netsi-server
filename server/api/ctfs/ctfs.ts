@@ -315,10 +315,23 @@ export default function ctf() {
 
                 if (utils.serverErr(err, res)) return;
 
-                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, req.body.name as string], (err, challengeID) => {
+                db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, req.body.old_name as string], (err, challengeID) => {
                     if (utils.challengeNotFoundErr(challengeID, res)) return;
 
                     if (utils.serverErr(err, res)) return;
+
+                    // if the name is being changed, check if the new name is taken
+                    if (req.body.old_name != req.body.name) {
+                        db.get("SELECT id FROM challenges WHERE ctf_id = ? AND name = ?", [ctfID.id, req.body.name as string], (err, row) => {
+                            if (row) {
+                                res.status(409);
+                                res.end("That challenge name is already taken");
+                                return;
+                            }
+
+                            if (utils.serverErr(err, res)) return;
+                        })
+                    }
 
                     db.run("UPDATE challenges SET name = ?, description = ?, points = ? WHERE id = ?", [req.body.name, req.body.description, req.body.points, challengeID.id], (err) => {
                         if (utils.nameTooLongErr(err, res)) return;

@@ -38,6 +38,7 @@ export default function AddChallenge() {
     axios.post(url, {
       title: ctfName,
       name: name,
+      old_name: challengeName,
       description: description,
       points: points
     }).then(resolve => {

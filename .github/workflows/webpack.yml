@@ -38,6 +38,8 @@ jobs:
     - name: Commit Files
       run: |
         mv ./server/dist ./serverbuild
+        mv ./server/package.json ./package.json
+        mv ./server/yarn.lock ./yarn.lock
         mv ./client/dist ./clientbuild
         rm -rf ./client
         rm -rf ./server

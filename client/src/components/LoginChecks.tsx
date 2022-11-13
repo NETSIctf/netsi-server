@@ -37,13 +37,13 @@ export function checkAdmin([setAdmin]: [React.Dispatch<React.SetStateAction<bool
       if (resolve.status == 200) {
         setAdmin(true);
       } else {
-        setAdmin(true);
+        setAdmin(false);
       }
     }).catch((err: AxiosError) => {
     if (err.response?.status == 500) {
       window.alert("500 ISE while attempting to auth");
     } else {
-      setAdmin(true);
+      setAdmin(false);
     }
   })
 }
