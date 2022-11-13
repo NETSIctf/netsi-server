@@ -37,16 +37,12 @@ jobs:
     
     - name: Commit Files
       run: |
-        mv ./server/dist ./serverbuild
-        mv ./server/package.json ./package.json
-        mv ./server/yarn.lock ./yarn.lock
-        mv ./client/dist ./clientbuild
-        rm -rf ./client
-        rm -rf ./server
         git add *
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git commit -a -m "Add dist"
+        rm .gitignore
+        git rm --cached *
+        git commit -a -m "Add Distribution files"
 
     - name: Push Changes
       uses: ad-m/github-push-action@master
