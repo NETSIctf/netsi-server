@@ -48,6 +48,9 @@ app.use("/api", apis(socketManager)); // ALL apis
 
 app.use("/assets", express.static("../client/dist/assets/")); // production files
 
+app.get("/favicon.png", (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, "../../client/dist/favicon.png"));
+});
 app.get("*", (req: Request, res: Response) => { // production main page
     res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
 })
