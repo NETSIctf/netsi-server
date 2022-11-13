@@ -219,11 +219,15 @@ export default function View() {
                         <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)}>Mark as solved</button>
                       </div>
                       : "" }</div>
-                  <div>
-                    <a className = {`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
-                  </div>
                   {isAdmin ?
-                    <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button>
+                    <div>
+                      <div>
+                        <a className = {`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
+                      </div>
+                      <div>
+                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)}>Delete</button>
+                      </div>
+                    </div>
                     : ""}
                 </div>
               )
