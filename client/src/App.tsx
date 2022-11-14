@@ -6,7 +6,7 @@ function App() {
   checkLoginNavigate();
 
   return (
-    <div className="d-flex flex-column" >
+    <div className="d-flex flex-column ml-2" >
       <header>
         <h1> NETSI MAIN PAGE </h1>
       </header>
