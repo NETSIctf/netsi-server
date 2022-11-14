@@ -1,13 +1,21 @@
+import { Link } from "react-router-dom";
 import { checkLoginNavigate } from "./components/LoginChecks";
 import "./scss/main.scss";
 
 function App() {
   checkLoginNavigate();
-  
+
   return (
-    <div>
-      <h1> NETSI MAIN PAGE </h1>
-      Fish is objectively bad, and this is objectively a test for some webhooks AGAIN x2
+    <div className="d-flex flex-column" >
+      <header>
+        <h1> NETSI MAIN PAGE </h1>
+      </header>
+      <main className="mt-2" >
+        Fish is objectively bad.
+      </main>
+      <footer className="mt-2" >
+        <Link to="/webshell" >Webshell</Link>
+      </footer>
     </div>
   )
 }
