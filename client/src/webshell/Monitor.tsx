@@ -45,7 +45,7 @@ export default function Monitor() {
 
         socket.on("connect", () => {
             appendTermData("Connected");
-            appendTermData("Now receiving request from /api/monitor");
+            appendTermData(`Now monitoring endpoint ${location.origin}/api/monitor`);
 
             socket.emit("initMonitor");
         });
