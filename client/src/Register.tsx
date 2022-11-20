@@ -23,7 +23,7 @@ export default function Register() {
             })
             .catch((err: AxiosError) => {
                 if (err.response?.status == 409) {
-                    setError("Nobody expected that someone else could have the same username as you, but they do. Try a different username.");
+                    setError("Nobody expected that someone else could have the same username as you, but they do. Please try a different username.");
                 } else if (err.response?.status == 400) {
                     setError("Invalid username or password, cannot be empty");
                 } else {
@@ -38,7 +38,7 @@ export default function Register() {
             <h1 className="text-center">NETSI</h1>
 
             <div className={`d-flex flex-column justify-content-center align-items-center`} onKeyDown={e => e.key == "Enter" ? register() : null} >
-                <div className={`bg-danger p-2 rounded d-${Error != "" ? "block" : "none"}`} >
+                <div className={`alert alert-danger fade rounded d-${Error ? "block show" : "none"}`} >
                     {Error}
                 </div>
 

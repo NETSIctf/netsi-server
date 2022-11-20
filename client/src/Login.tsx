@@ -48,10 +48,10 @@ function Login() {
         <div>
           <h2>Login:</h2>
         </div>
-        <div className={`bg-danger p-2 rounded d-${loginFail ? "block" : "none"}`} >
+        <div className={`alert alert-danger fade rounded d-${loginFail ? "block show" : "none"}`} >
           Nobody expected that your username or password could be wrong, but it somehow is.
         </div>
-        <div className={`bg-success p-2 rounded d-${newUser ? "block" : "none"}`} >
+        <div className={`alert alert-success fade rounded d-${newUser ? "block show" : "none"}`} >
           Registration successful! Please log in.
         </div>
         <div className={`mt-2`} >

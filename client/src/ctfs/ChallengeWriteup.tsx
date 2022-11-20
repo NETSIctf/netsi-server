@@ -66,11 +66,11 @@ export default function ChallengeWriteup() {
             onChange={(value) => setWriteup(value as string)}
           />
           <div className={`mt-2 d-flex flex-column justify-content-center align-items-center`}>
-            <div className={`alert alert-danger alert-dismissible rounded d-${error == "" ?  "none" : "block show"}`}>
+            <div className={`alert alert-danger alert-dismissible rounded d-${error ?  "block show" : "none"}`}>
               {error}
               <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
             </div>
-            <div className={`alert alert-success alert-dismissible rounded d-${success == "" ?  "none" : "block show"}`}>
+            <div className={`alert alert-success alert-dismissible rounded d-${success ?  "block show" : "none"}`}>
               {success}
               <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSuccess("")} />
             </div>
