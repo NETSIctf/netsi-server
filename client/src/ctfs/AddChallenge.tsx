@@ -21,7 +21,7 @@ export default function AddChallenge() {
 
   useEffect(() => {
     if (isEdit) {
-      axios.get(`/api/ctfs/editChallenge?title=${ctfName}&name=${ challengeName }`).then(resolve => {
+      axios.get(`/api/ctfs/editChallenge?title=${ctfName}&name=${challengeName}`).then(resolve => {
         if (resolve.status === 200) {
           SetName(resolve.data.name);
           SetDescription(resolve.data.description);
@@ -66,21 +66,21 @@ export default function AddChallenge() {
           : <h2>Add Challenge:</h2>
         }
       </div>
-      <div className={`alert alert-danger alert-dismissible fade rounded d-${ error == "" ?  "none" : "block show" }`} role="alert" >
+      <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ? "none" : "block show"}`} role="alert" >
         {error}
-        <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={ () => setError("") } />
+        <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
       </div>
       <div className={`mt-2`} >
-        <Form.Control type="text" placeholder="Name" value={ name } onChange={event => SetName(event.target.value)} />
+        <Form.Control type="text" placeholder="Name" value={name} onChange={event => SetName(event.target.value)} />
       </div>
       <div className={`mt-2`} >
-        <Form.Control as="textarea" placeholder="Description" value={ description } onChange={(event) => SetDescription(event.target.value)} />
+        <Form.Control as="textarea" placeholder="Description" value={description} onChange={(event) => SetDescription(event.target.value)} />
       </div>
       <div className={`mt-2`} >
-        <Form.Control type="number" placeholder="Points" value={ points } onChange={(event) => SetPoints(event.target.value)} />
+        <Form.Control type="number" placeholder="Points" value={points} onChange={(event) => SetPoints(event.target.value)} />
       </div>
       <div className={`mt-2`} >
-          <Button variant="primary" onClick={ addChallenge } disabled={ adding }>{ adding ? "Adding Challenge..." : isEdit ? "Edit Challenge" : "Add Challenge" }</Button>
+        <Button variant="primary" onClick={addChallenge} disabled={adding}>{adding ? "Adding Challenge..." : isEdit ? "Edit Challenge" : "Add Challenge"}</Button>
       </div>
       <div className={`mt-2`} >
         <Button variant="secondary" onClick={() => navigate(`/ctfs/view?title=${encodeURIComponent(ctfName)}`)}>Cancel</Button>

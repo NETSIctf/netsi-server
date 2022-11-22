@@ -1,4 +1,4 @@
-import {checkAdmin, checkLoginNavigate} from "../components/LoginChecks";
+import { checkAdmin, checkLoginNavigate } from "../components/LoginChecks";
 import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
@@ -38,7 +38,7 @@ export default function View() {
   function deleteCTF() {// deletes a CTF from the database
     if (!confirm("Are you sure you want to delete this CTF?")) return; // confirm deletion
     setDeleting(true);
-    axios.post(`/api/ctfs/delete`, {"title" : ctfName}).then(resolve => {
+    axios.post(`/api/ctfs/delete`, { "title": ctfName }).then(resolve => {
       setDeleting(false);
       if (resolve.status === 200) {
         // success
@@ -55,7 +55,7 @@ export default function View() {
   function addMember() {
     setJoining(true);
     // adds a member to the CTF
-    axios.post(`/api/ctfs/addMember`, {"title":ctfName}).then(resolve => {
+    axios.post(`/api/ctfs/addMember`, { "title": ctfName }).then(resolve => {
       setJoining(false);
       console.log(resolve);
       if (resolve.status === 200) {
@@ -72,7 +72,7 @@ export default function View() {
   function removeMember() {
     // removes a member from the CTF
     setJoining(true);
-    axios.post(`/api/ctfs/removeMember`, {"title" : ctfName}).then(resolve => {
+    axios.post(`/api/ctfs/removeMember`, { "title": ctfName }).then(resolve => {
       console.log(resolve);
       setJoining(false);
       if (resolve.status === 200) {
@@ -89,7 +89,7 @@ export default function View() {
   function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
     setSolving(true);
-    axios.post(`/api/ctfs/${isSolved ? "unsolveChallenge": "solveChallenge"}`, {
+    axios.post(`/api/ctfs/${isSolved ? "unsolveChallenge" : "solveChallenge"}`, {
       "title": ctfName,
       "challengeTitle": challenge,
       "flag": flag,
@@ -213,27 +213,27 @@ export default function View() {
                   <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
                   <p className={`mt-2 ${challenge.solved_by ? `green-text` : `red-text`}`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
 
-                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChallengeError == "" ?  "none" : "block show"}`} role="alert" >
+                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChallengeError == "" ? "none" : "block show"}`} role="alert" >
                     {solveChallengeError}
                     <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSolveChallengeError("")} />
                   </div>
-                  { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
-                  <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
-                    <button className={`btn btn-danger mt-3`} onClick={() => solve(challenge.name, true )} disabled={solving}>{ solving ? "unsolving..." : "Mark as unsolved" }</button>
-                  :
+                  {challenge.solved_by ? <p className={`green-text`}>Flag: {challenge.flag}</p> : ""}
+                  <div>{challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
+                    <button className={`btn btn-danger mt-3`} onClick={() => solve(challenge.name, true)} disabled={solving}>{solving ? "unsolving..." : "Mark as unsolved"}</button>
+                    :
                     joined ?
                       <div>
                         <Form.Control type={`text`} placeholder={`Flag`} className={`mt-3`} onChange={(e) => setFlag(e.target.value)} />
-                        <button className={`btn btn-success mt-3`} onClick={() => solve(challenge.name, false)} disabled={solving}>{ solving ? "Solving..." : "Mark as solved"}</button>
+                        <button className={`btn btn-success mt-3`} onClick={() => solve(challenge.name, false)} disabled={solving}>{solving ? "Solving..." : "Mark as solved"}</button>
                       </div>
-                      : "" }</div>
+                      : ""}</div>
                   {isAdmin ?
                     <div>
                       <div>
-                        <a className = {`btn btn-primary mt-3`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
+                        <a className={`btn btn-primary mt-3`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
                       </div>
                       <div>
-                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)} disabled={ deletingChallenge }>{ deletingChallenge ? "Deleting..." : "Delete" }</button>
+                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)} disabled={deletingChallenge}>{deletingChallenge ? "Deleting..." : "Delete"}</button>
                       </div>
                     </div>
                     : ""}
