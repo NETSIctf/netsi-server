@@ -3,6 +3,7 @@ import sqlite3 from "sqlite3";
 
 import createTables from "./createTables";
 import * as utils from "./utils";
+import {pointsMustBeNumberErr} from "./utils";
 
 const db = new sqlite3.Database("ctf.db", (err) => {
     if (err) {
@@ -19,6 +20,12 @@ export default function ctf() {
     router.post("/add", (req, res) => {
         // adds a new ctf
         if (req.check_auth("admin")) {
+            // if the start is before the end, return error
+            if (req.body.start > req.body.end) {
+                res.status(400);
+                res.end("start date must be before end date. Are you trying to time travel?");
+                return;
+            }
             db.run("INSERT INTO ctfs (name, description, start, end) VALUES (?, ?, ?, ?)", [req.body.name, req.body.description, req.body.start, req.body.end], function (err) {
                 if (err) {
                     if (err.message.includes("UNIQUE constraint failed")) {
@@ -109,20 +116,16 @@ export default function ctf() {
 
                 if (utils.CTFNotFoundErr(row, res)) return;
 
-                if (req.body.points.match(/^[0-9]+$/) == null) {
-                    res.status(400);
-                    res.end("Invalid points, must be a number");
-                    return;
-                }
+                if (pointsMustBeNumberErr(req.body.points, res)) return;
 
                 db.get(`SELECT id FROM challenges WHERE name = ? AND ctf_id = ?`, [req.body.name, row.id], (err, ids) => {
-                    if (utils.serverErr(err, res)) return;
-
                     if (ids) {
                         res.status(409);
                         res.end("challenge already exists");
                         return;
                     }
+
+                    if (utils.serverErr(err, res)) return;
 
                     let writeup = `# ${ctfName} - ${req.body.name}`;
 

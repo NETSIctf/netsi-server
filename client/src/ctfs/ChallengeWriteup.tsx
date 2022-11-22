@@ -18,12 +18,17 @@ export default function ChallengeWriteup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [saving, setSaving] = useState(false);
+
   function saveWriteup() {
+    setSaving(true);
     axios.post("/api/ctfs/updateWriteup", {title: ctfName, challengeTitle: challengeName, writeup: writeup}).then(resolve => {
+      setSaving(false);
       if (resolve.status === 200) {
         setSuccess("Writeup saved successfully");
       }
     }).catch(reject => {
+      setSaving(false);
       console.error(reject);
       setError(reject.response.data);
     })
@@ -61,11 +66,11 @@ export default function ChallengeWriteup() {
             onChange={(value) => setWriteup(value as string)}
           />
           <div className={`mt-2 d-flex flex-column justify-content-center align-items-center`}>
-            <div className={`alert alert-danger alert-dismissible rounded d-${error == "" ?  "none" : "block show"}`}>
+            <div className={`alert alert-danger alert-dismissible rounded d-${error ?  "block show" : "none"}`}>
               {error}
               <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
             </div>
-            <div className={`alert alert-success alert-dismissible rounded d-${success == "" ?  "none" : "block show"}`}>
+            <div className={`alert alert-success alert-dismissible rounded d-${success ?  "block show" : "none"}`}>
               {success}
               <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSuccess("")} />
             </div>
@@ -76,11 +81,11 @@ export default function ChallengeWriteup() {
           </div>
 
           <div className={`text-center mt-2`}>
-            <Button variant="success" onClick={ saveWriteup }>Save</Button>
+            <Button variant="success" onClick={ saveWriteup } disabled={saving}>{saving ? `Saving...` : `Save`}</Button>
           </div>
 
           <div className={`text-center mt-2`}>
-            <Button variant={`success`} onClick={ () => { saveWriteup(); returnToChallenge() } }>Save and exit</Button>
+            <Button variant={`success`} onClick={ () => { saveWriteup(); returnToChallenge() } } disabled={saving} >{saving ? `Saving...` : `Save and exit`}</Button>
           </div>
         </div>
 

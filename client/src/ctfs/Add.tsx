@@ -16,17 +16,22 @@ export default function Add() {
   const [description, SetCTFDescription] = useState("");
   const [start, SetCTFStart] = useState(new Date());
   const [end, SetCTFEnd] = useState(new Date());
-  
+
+  const [adding, setAdding] = useState(false);
+
   function addCTF() {
     // adds a CTF to the database
+    setAdding(true);
     axios.post("/api/ctfs/add", { name: title, description: description, start: start, end: end}).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
+        setAdding(false);
         console.log("success");
         navigate(`/ctfs/view?title=${encodeURIComponent(title)}`);
       }
     }).catch(reject => {
+      setAdding(false);
       console.error(reject);
       setError(reject.response.data);
     })
@@ -57,7 +62,7 @@ export default function Add() {
           <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
         </div>
         <div className={`mt-2`} >
-          <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
+          <Button variant="primary" onClick={() => addCTF()} disabled={ adding } >{adding ? `Adding CTF...` : `Add CTF`}</Button>
         </div>
       </div>
     </div>

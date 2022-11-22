@@ -87,6 +87,11 @@ export default function userApi(apis: Router) {
             type = "admin";
         } else {
             let user = await getUser(username);
+            if (!user) {
+                // if the user doesn't exist, fail auth
+                res.auth_fail();
+                return false;
+            }
             hash = user.password;
             type = "user";
         }

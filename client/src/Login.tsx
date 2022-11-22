@@ -44,18 +44,15 @@ function Login() {
   return (
     <div>
       <h1 className="text-center">NETSI</h1>
-
       <div className={`d-flex flex-column justify-content-center align-items-center`} onKeyDown={e => e.key == "Enter" ? login() : null} >
-        <div className={`bg-danger p-2 rounded d-${loginFail ? "block" : "none"}`} >
+        <div>
+          <h2>Login:</h2>
+        </div>
+        <div className={`alert alert-danger fade rounded d-${loginFail ? "block show" : "none"}`} >
           Nobody expected that your username or password could be wrong, but it somehow is.
         </div>
-
-        <div className={`bg-success p-2 rounded d-${newUser ? "block" : "none"}`} >
+        <div className={`alert alert-success fade rounded d-${newUser ? "block show" : "none"}`} >
           Registration successful! Please log in.
-        </div>
-
-        <div className={`mt-2`} >
-          <h2>Login:</h2>
         </div>
         <div className={`mt-2`} >
           <Form.Control type="text" placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />

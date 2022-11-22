@@ -211,7 +211,7 @@ export default function View() {
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
                   <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
-                  <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
+                  <p className={`mt-2 ${challenge.solved_by ? `green-text` : `red-text`}`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
 
                   <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChallengeError == "" ?  "none" : "block show"}`} role="alert" >
                     {solveChallengeError}
@@ -219,18 +219,18 @@ export default function View() {
                   </div>
                   { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
                   <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
-                    <button className={`btn btn-danger`} onClick={() => solve(challenge.name, true )} disabled={solving}>{ solving ? "unsolving..." : "Mark as unsolved" }</button>
+                    <button className={`btn btn-danger mt-3`} onClick={() => solve(challenge.name, true )} disabled={solving}>{ solving ? "unsolving..." : "Mark as unsolved" }</button>
                   :
                     joined ?
                       <div>
                         <Form.Control type={`text`} placeholder={`Flag`} className={`mt-3`} onChange={(e) => setFlag(e.target.value)} />
-                        <button className={`btn btn-success mt-2`} onClick={() => solve(challenge.name, false)} disabled={solving}>{ solving ? "Solving..." : "Mark as solved"}</button>
+                        <button className={`btn btn-success mt-3`} onClick={() => solve(challenge.name, false)} disabled={solving}>{ solving ? "Solving..." : "Mark as solved"}</button>
                       </div>
                       : "" }</div>
                   {isAdmin ?
                     <div>
                       <div>
-                        <a className = {`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
+                        <a className = {`btn btn-primary mt-3`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
                       </div>
                       <div>
                         <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)} disabled={ deletingChallenge }>{ deletingChallenge ? "Deleting..." : "Delete" }</button>
@@ -243,7 +243,7 @@ export default function View() {
           </div>
           {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? joined ? "Leaving..." : "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
           {isAdmin ?
-            <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button>
+            <button onClick={() => deleteCTF()} className="btn btn-danger mt-3" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button>
             : null}
         </div>
       )
