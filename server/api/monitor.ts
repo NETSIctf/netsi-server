@@ -9,7 +9,7 @@ export default function monitorApi(apis: Router, socketManager: WSocket) {
     let sockets: Socket[] = [];
 
     apis.all("/monitor", (req, res) => {
-        let req2str = `${req.method} ${req.path} Cookies: ${JSON.stringify(req.cookies)} Body: ${JSON.stringify(req.body)}`;
+        let req2str = `${req.method} ${req.path} Query: ${JSON.stringify(req.query)} Body: ${JSON.stringify(req.body)}`;
         monData.push({ data: req2str, headers: req.headers });
 
         var toSend = JSON.stringify({ data: req2str, headers: req.headers })
