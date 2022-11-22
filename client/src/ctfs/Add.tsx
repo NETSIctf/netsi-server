@@ -16,34 +16,24 @@ export default function Add() {
   const [description, SetCTFDescription] = useState("");
   const [start, SetCTFStart] = useState(new Date());
   const [end, SetCTFEnd] = useState(new Date());
-  
+
+  const [adding, setAdding] = useState(false);
+
   function addCTF() {
     // adds a CTF to the database
-    axios.post("/api/ctfs/add", { name: title, description: description, start: start, end: end}).then(resolve => {
+    setAdding(true);
+    axios.post("/api/ctfs/add", { name: title, description: description, start: start, end: end }).then(resolve => {
       console.log(resolve);
       if (resolve.status === 200) {
         // success
+        setAdding(false);
         console.log("success");
-        navigate("/ctfs/" + title);
+        navigate(`/ctfs/view?title=${encodeURIComponent(title)}`);
       }
     }).catch(reject => {
+      setAdding(false);
       console.error(reject);
-      if (reject.response.data == "ctf already exists") {
-        console.log("ctf already exists");
-        setError("CTF already exists");
-      }
-      else if (reject.response.data == "Invalid name") {
-        console.log("Invalid name");
-        setError("Invalid name. Names must be a letter or a number.");
-      }
-      else if (reject.response.data.includes("too long")) {
-        console.log(reject.response.data);
-        setError(reject.response.data);
-      }
-      else {
-        console.log("Error adding CTF");
-        setError("Error adding CTF, please try again later.");
-      }
+      setError(reject.response.data);
     })
   }
 
@@ -51,9 +41,9 @@ export default function Add() {
     <div>
       <div className={`d-flex flex-column justify-content-center align-items-center`}>
         <div className={`mt-2`} >
-            <h2>Add CTF:</h2>
+          <h2>Add CTF:</h2>
         </div>
-        <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ?  "none" : "block show"}`} role="alert" >
+        <div className={`alert alert-danger alert-dismissible fade rounded d-${error == "" ? "none" : "block show"}`} role="alert" >
           {error}
           <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setError("")} />
         </div>
@@ -63,18 +53,21 @@ export default function Add() {
         <div className={`mt-2`} >
           <Form.Control as="textarea" placeholder="Description" value={description} onChange={event => SetCTFDescription(event.target.value)} />
         </div>
-        Start Date:
-        <div className={`mt-2`} >
-          <DatePicker selected={start} onChange={(date: Date) => SetCTFStart(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
-        </div>
-        End Date:
-        <div className={`mt-2`} >
-          <DatePicker selected={end} onChange={(date: Date) => SetCTFEnd(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
-        </div>
-        <div className={`mt-2`} >
-          <Button variant="primary" onClick={() => addCTF()} >Add CTF</Button>
+        <DatePickerWrapper name={"Start Date:"} onChange={(date) => SetCTFStart(date)} selected={start} />
+        <DatePickerWrapper name="End Date:" onChange={(date) => SetCTFEnd(date)} selected={end} />
+        <div className={`mt-3`} >
+          <Button variant="primary" onClick={() => addCTF()} disabled={adding} >{adding ? `Adding CTF...` : `Add CTF`}</Button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function DatePickerWrapper({ name, onChange, selected }: { name: string, onChange: (date: Date) => void, selected: Date }) {
+  return (
+    <div className="mt-2 text-center" >
+      <span>{name}</span>
+      <DatePicker selected={selected} onChange={(date: Date) => onChange(date)} dateFormat="yyyy-MM-dd hh:mm aa" showTimeSelect />
     </div>
   )
 }

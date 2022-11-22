@@ -48,11 +48,14 @@ app.use("/api", apis(socketManager)); // ALL apis
 
 app.use("/assets", express.static("../client/dist/assets/")); // production files
 
+app.get("/favicon.png", (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, "../../client/dist/favicon.png"));
+});
 app.get("*", (req: Request, res: Response) => { // production main page
     res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
 })
 
-// Server creation
+// Server creation 
 if (process.env.NODE_ENV == "production") {
     const options = { // ssl
         key: fs.readFileSync('/etc/letsencrypt/live/netsi.tk/privkey.pem'), // instance specific keys (certbot)

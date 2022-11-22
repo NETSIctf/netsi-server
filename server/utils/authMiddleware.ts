@@ -33,6 +33,7 @@ export function check_auth(a: Request | string, b?: Response | "user" | "admin",
                 if (auth.perms == "admin") {
                     return true;
                 } else {
+                    response.auth_fail();
                     return false;
                 }
             } else {

@@ -1,46 +1,44 @@
-import { checkLoginNavigate } from "../components/LoginChecks";
+import {checkAdmin, checkLoginNavigate} from "../components/LoginChecks";
 import axios, { AxiosError } from "axios"
 import { useState, useEffect } from "react";
 import NoPage from '../NoPage'
-import { useNavigate, useParams } from "react-router-dom";
-
-type challenge = {
-  name: string,
-  description: string,
-  points: number,
-  solved_by: string
-}
-
-type ctfData = {
-  name: string,
-  description: string,
-  start: string,
-  end: string,
-  members: string[],
-  challenges: challenge[],
-}
+import { useNavigate, useLocation } from "react-router-dom";
+import { Form } from "react-bootstrap";
+import { ctfData } from "./Types";
+import { parseDate } from "./Utils";
 
 export default function View() {
   const navigate = useNavigate();
-  const params = useParams();
+  const ctfName = decodeURIComponent(new URLSearchParams(useLocation().search).get("title") as string); // name of ctf from query
 
-  const [ctf, setCtf] = useState<ctfData>({ name: "Loading...", description: "No Description", start: "", end: "", members: [], challenges: [] });
+  const [ctf, setCtf] = useState<ctfData>({
+    name: "Loading...",
+    description: "",
+    start: "",
+    end: "",
+    members: [],
+    challenges: []
+  });
+
   const [status, setStatus] = useState<number>(200);
   const [joining, setJoining] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [solving, setSolving] = useState(false);
+  const [deletingChallenge, setDeletingChallenge] = useState(false);
   const [joined, setJoined] = useState(false);
   const [isAdmin, setAdmin] = useState(false);
   const [points, setPoints] = useState(0); // current CTF points
   const [maxPoints, setMaxPoints] = useState(0); // max CTF points
+  const [username, setUsername] = useState("");
+  const [flag, setFlag] = useState(""); // flag to submit
+  const [solveChallengeError, setSolveChallengeError] = useState("");
 
   checkLoginNavigate();
 
-  // get the ctf name from the url
-  const ctfName = params.ctfId;
-
   function deleteCTF() {// deletes a CTF from the database
+    if (!confirm("Are you sure you want to delete this CTF?")) return; // confirm deletion
     setDeleting(true);
-    axios.post("/api/ctfs/delete/" + ctfName).then(resolve => {
+    axios.post(`/api/ctfs/delete`, {"title" : ctfName}).then(resolve => {
       setDeleting(false);
       if (resolve.status === 200) {
         // success
@@ -57,7 +55,7 @@ export default function View() {
   function addMember() {
     setJoining(true);
     // adds a member to the CTF
-    axios.post("/api/ctfs/addMember/" + ctfName).then(resolve => {
+    axios.post(`/api/ctfs/addMember`, {"title":ctfName}).then(resolve => {
       setJoining(false);
       console.log(resolve);
       if (resolve.status === 200) {
@@ -72,26 +70,56 @@ export default function View() {
   }
 
   function removeMember() {
-    setJoining(true);
     // removes a member from the CTF
-    axios.post("/api/ctfs/removeMember/" + ctfName).then(resolve => {
-      setJoining(false);
+    setJoining(true);
+    axios.post(`/api/ctfs/removeMember`, {"title" : ctfName}).then(resolve => {
       console.log(resolve);
+      setJoining(false);
       if (resolve.status === 200) {
         // success
         window.location.reload();
       }
     }).catch(reject => {
-      setJoining(false);
       console.error(reject);
+      setJoining(false);
       alert("Error Leaving CTF\n" + reject);
     })
   }
 
-  function solve(challenge: string) {
+  function solve(challenge: string, isSolved: boolean) {
     // solves a challenge
-    axios.post("/api/ctfs/solveChal/" + ctfName + "/" + challenge).then(resolve => {
+    setSolving(true);
+    axios.post(`/api/ctfs/${isSolved ? "unsolveChallenge": "solveChallenge"}`, {
+      "title": ctfName,
+      "challengeTitle": challenge,
+      "flag": flag,
+    }).then(resolve => {
+      setSolving(false);
       console.log(resolve);
+      if (resolve.status === 200) {
+        // success
+        window.location.reload();
+      }
+      else {
+        console.error(resolve);
+        setSolveChallengeError(resolve.data);
+      }
+    }).catch(reject => {
+      setSolving(false);
+      console.error(reject);
+      setSolveChallengeError(reject.response.data);
+    })
+  }
+
+  function deleteChallenge(challenge: string) {
+    // deletes a challenge
+    setDeletingChallenge(true);
+    if (!confirm("Are you sure you want to delete this challenge?")) return; // confirm deletion
+    axios.post(`/api/ctfs/deleteChallenge`, {
+      "title": ctfName,
+      "challengeTitle": challenge
+    }).then(resolve => {
+      setDeletingChallenge(false);
       if (resolve.status === 200) {
         // success
         window.location.reload();
@@ -100,18 +128,25 @@ export default function View() {
         alert(resolve.status);
       }
     }).catch(reject => {
+      setDeletingChallenge(false);
       console.error(reject);
       alert(reject.request.response);
     })
   }
 
   useEffect(() => { // load the ctf
-    axios.get(`/api/ctfs/${ctfName}`).then(result => {
+    axios.get("/api/username").then(resolve => {
+      setUsername(resolve.data);
+    }).catch(reject => {
+      console.error(reject);
+    })
+
+    axios.get(`/api/ctfs/view?title=${encodeURIComponent(ctfName)}`).then(result => {
       setStatus(result.status);
 
       // properly display the date
-      result.data.start = new Date(result.data.start).toISOString().slice(0, 16).replace("T", ", ");
-      result.data.end = new Date(result.data.end).toISOString().slice(0, 16).replace("T", ", ");
+      result.data.start = parseDate(result.data.start);
+      result.data.end = parseDate(result.data.end);
 
       if (result.data.members.includes(result.data.username)) {
         setJoined(true);
@@ -146,20 +181,7 @@ export default function View() {
       setStatus(reject.response?.status || 500);
     })
 
-    axios.get("/api/login", { params: { admin: true } })
-      .then(resolve => {
-        if (resolve.status == 200) {
-          setAdmin(true);
-        } else {
-          setAdmin(false);
-        }
-      }).catch((err: AxiosError) => {
-        if (err.response?.status == 500) {
-          window.alert("500 ISE while attempting to auth");
-        } else {
-          setAdmin(false);
-        }
-      })
+    checkAdmin([setAdmin]);
   }, [])
 
   switch (status) {
@@ -180,7 +202,7 @@ export default function View() {
             })}
           </div>
           <p className={`mt-3`}>Challenges:</p>
-          <a className={`btn btn-primary`} href={`/ctfs/${ctfName}/addChallenge`}>Add Challenge</a>
+          <a className={`btn btn-primary`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}`}>Add Challenge</a>
           <div className={`list-group mt-3`}>
             {ctf.challenges.length === 0 ? <div className={`list-group-item list-group-item-action dark-list-group-item`}>none</div> : ctf.challenges.map((challenge, index) => {
               return (
@@ -188,14 +210,41 @@ export default function View() {
                   <h3 className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.name}</h3>
                   <p>{challenge.description}</p>
                   <p>Points: {challenge.points}</p>
-                  <p className={challenge.solved_by ? `green-text` : `red-text`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
-                  {challenge.solved_by ? "" : <button className={`btn btn-success`} onClick={() => solve(challenge.name)}>Mark as solved</button>}
+                  <a className={`btn btn-primary`} href={`/ctfs/challengeWriteup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challenge.name)}`}>Writeup</a>
+                  <p className={`mt-2 ${challenge.solved_by ? `green-text` : `red-text`}`}>{challenge.solved_by ? `Solved by: ${challenge.solved_by}` : "Not solved"}</p>
+
+                  <div className={`alert alert-danger alert-dismissible fade rounded d-${solveChallengeError == "" ?  "none" : "block show"}`} role="alert" >
+                    {solveChallengeError}
+                    <button type="button" className="btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setSolveChallengeError("")} />
+                  </div>
+                  { challenge.solved_by ? <p className={`green-text`}>Flag: { challenge.flag }</p> : ""}
+                  <div>{ challenge.solved_by && (challenge.solved_by == username || isAdmin) ?
+                    <button className={`btn btn-danger mt-3`} onClick={() => solve(challenge.name, true )} disabled={solving}>{ solving ? "unsolving..." : "Mark as unsolved" }</button>
+                  :
+                    joined ?
+                      <div>
+                        <Form.Control type={`text`} placeholder={`Flag`} className={`mt-3`} onChange={(e) => setFlag(e.target.value)} />
+                        <button className={`btn btn-success mt-3`} onClick={() => solve(challenge.name, false)} disabled={solving}>{ solving ? "Solving..." : "Mark as solved"}</button>
+                      </div>
+                      : "" }</div>
+                  {isAdmin ?
+                    <div>
+                      <div>
+                        <a className = {`btn btn-primary mt-3`} href={`/ctfs/addChallenge?title=${encodeURIComponent(ctfName)}&challenge=${challenge.name}&edit=true`}>Edit Challenge</a>
+                      </div>
+                      <div>
+                        <button className={`btn btn-danger mt-3`} onClick={() => deleteChallenge(challenge.name)} disabled={ deletingChallenge }>{ deletingChallenge ? "Deleting..." : "Delete" }</button>
+                      </div>
+                    </div>
+                    : ""}
                 </div>
               )
             })}
           </div>
-          {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
-          {isAdmin ? <button onClick={() => deleteCTF()} className="btn btn-danger mt-2" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button> : null}
+          {<button onClick={() => joined ? removeMember() : addMember()} className="btn btn-primary mt-4" disabled={joining} >{joining ? joined ? "Leaving..." : "Joining..." : joined ? "Leave CTF" : "Join CTF"}</button>}
+          {isAdmin ?
+            <button onClick={() => deleteCTF()} className="btn btn-danger mt-3" disabled={deleting} >{deleting ? "Deleting..." : "Delete CTF"}</button>
+            : null}
         </div>
       )
     case 404:
