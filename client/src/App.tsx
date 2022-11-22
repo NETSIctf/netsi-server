@@ -6,15 +6,17 @@ function App() {
   checkLoginNavigate();
 
   return (
-    <div className="d-flex flex-column ml-2" >
+    <div className="d-flex flex-column p-2 ms-2" >
       <header>
         <h1> NETSI MAIN PAGE </h1>
       </header>
       <main className="mt-2" >
         Fish is objectively bad.
       </main>
-      <footer className="mt-2" >
-        <Link to="/webshell" >Webshell</Link>
+      <footer className="mt-2 d-flex flex-column" >
+        <div>
+          {Date.now()}ms since epoch
+        </div>
       </footer>
     </div>
   )
