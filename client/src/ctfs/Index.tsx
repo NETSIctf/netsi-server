@@ -1,7 +1,7 @@
 import { Outlet, Route, Routes } from "react-router-dom";
 import Add from "./Add";
 import List from "./List";
-import View from "./View_new";
+import View from "./View/View";
 import AddChallenge from "./AddChallenge";
 import ChallengeWriteup from "./ChallengeWriteup";
 
