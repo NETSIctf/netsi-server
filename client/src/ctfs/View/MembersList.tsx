@@ -1,15 +1,19 @@
+import { useContext } from "react"
 import { MinusSquare, PlusSquare } from "react-feather"
+import { CTFContext } from "./View"
 
 export default function MembersList() {
+    const ctfData = useContext(CTFContext);
+
+    const members = ctfData.members.map((name) => <Member name={name} key={name} />);
+
     return (
         <div className={`p-0 d-flex flex-column position-absolute top-50 end-0 translate-middle-y rounded-start border border-end-0 h-50`} >
             <div className="d-flex align-items-center border-bottom p-2" >
                 <h1 className="me-5" >Members</h1>
                 <PlusSquare className="text-success cursor-pointer" size="35" />
             </div>
-            <Member name="0x41*32" />
-            <Member name="wsquarepa" />
-            <Member name="GiveBread" />
+            {members}
         </div>
     )
 }
