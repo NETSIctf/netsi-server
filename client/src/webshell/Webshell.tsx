@@ -3,6 +3,8 @@ import Terminal, { ColorMode, TerminalInput, TerminalOutput } from "react-termin
 
 import io from "socket.io-client";
 
+import "../scss/webshell.scss";
+
 const socket = io({ autoConnect: false });
 
 type monDataType = { data: string, headers: any };

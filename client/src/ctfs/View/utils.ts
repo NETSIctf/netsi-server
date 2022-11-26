@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {NavigateFunction} from "react-router-dom";
+import { NavigateFunction } from "react-router-dom";
 
 export function deleteCTF(ctfName: string, navigate: NavigateFunction): boolean {
   console.log("deleting CTF");
@@ -22,14 +22,10 @@ export function deleteCTF(ctfName: string, navigate: NavigateFunction): boolean 
   return false;
 }
 
-export function addMember() {}
+export function addMember() { }
 
-export function deleteMember() {}
+export function deleteMember() { }
 
-export function solve() {}
+export function solve() { }
 
-export function deleteChallenge() {}
-
-export function test() {
-  return "test";
-}
+export function deleteChallenge() { }

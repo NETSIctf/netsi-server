@@ -28,34 +28,14 @@ body, html, #root {
     flex-direction: column;
 }
 
-.react-terminal-wrapper::before {
-    content: unset !important;
-}
-
-.react-terminal-wrapper {
-    padding: 45px !important;
-}
-
-.dark-list-group-item {
-    background-color: $primary;
-    color: $light;
-    text-align: center;
-}
-
-.dark-list-group-item:hover {
-    background-color: $primary;
-    color: $light;
-}
-
-.dark-list-group-item-hover:hover {
-    background-color: $secondary;
-    color: $light;
-}
-
 .red-text {
     color: $danger;
 }
 
 .green-text {
     color: $success;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }

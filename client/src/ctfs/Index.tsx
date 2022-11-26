@@ -5,6 +5,8 @@ import View from "./View/View";
 import AddChallenge from "./AddChallenge";
 import ChallengeWriteup from "./ChallengeWriteup";
 
+import "../scss/ctfs.scss";
+
 export default function Index() {
     return (
         <>
