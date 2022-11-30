@@ -7,3 +7,8 @@ export function parseCookie(str: string) {
             return acc;
         }, {});
 }
+
+export function getUsername() {
+    let cookieData = parseCookie(document.cookie);
+    return cookieData.username;
+}
