@@ -181,7 +181,7 @@ export default function View() {
       setStatus(reject.response?.status || 500);
     })
 
-    checkAdmin([setAdmin]);
+    checkAdmin().then(val => setAdmin(val));
   }, [])
 
   switch (status) {

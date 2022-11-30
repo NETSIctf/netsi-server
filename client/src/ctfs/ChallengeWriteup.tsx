@@ -39,7 +39,9 @@ export default function ChallengeWriteup() {
   }
 
   useEffect(() => {
-    checkAdmin([setAdmin]);
+    
+    checkAdmin()
+    .then(val => setAdmin(val));
 
     axios.get(`/api/ctfs/writeup?title=${encodeURIComponent(ctfName)}&challenge=${encodeURIComponent(challengeName)}`).then(resolve => {
       if (resolve.status === 200) {

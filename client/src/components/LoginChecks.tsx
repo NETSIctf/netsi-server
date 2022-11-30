@@ -1,5 +1,5 @@
-import axios, {AxiosError} from "axios";
-import {useEffect} from "react";
+import axios, { AxiosError } from "axios";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function checkLoginNavigate() {// checks if the user is logged in. If they are, it does nothing. If they are not, it redirects them to the login page.
@@ -31,19 +31,25 @@ export function checkLogin() {
   })
 }
 
-export function checkAdmin([setAdmin]: [React.Dispatch<React.SetStateAction<boolean>>]) {
-  axios.get("/api/login", { params: { admin: true } })
-    .then(resolve => {
-      if (resolve.status == 200) {
-        setAdmin(true);
-      } else {
-        setAdmin(false);
-      }
-    }).catch((err: AxiosError) => {
-    if (err.response?.status == 500) {
-      window.alert("500 ISE while attempting to auth");
+export async function checkAdmin() {
+  try {
+    let response = await axios.get("/api/login", { params: { admin: true } });
+    if (response.status == 200) {
+      return true;
     } else {
-      setAdmin(false);
+      return false;
     }
-  })
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status == 500) {
+        alert("500 ISE while attempting to auth");
+      }
+
+      return false;
+    } else {
+      alert("Client Error, check console for details");
+      console.error(err);
+      return false;
+    }
+  }
 }

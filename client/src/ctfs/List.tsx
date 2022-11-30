@@ -16,7 +16,7 @@ export default function List() {
       console.log(reject);
     })
 
-    checkAdmin([setAdmin]);
+    checkAdmin().then(val => setAdmin(val));
   }, [])
 
   return (
