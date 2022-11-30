@@ -7,13 +7,14 @@ import { ctfData as ctfDataType } from "../Types";
 import { getUsername } from "../../util";
 import MembersList from "./MembersList";
 import CTFInfo from "./CTFInfo";
+import Settings from "./Settings";
 
 export type updateActionsType = {
     members: {
         add: () => Promise<any>;
         remove: () => Promise<any>;
     };
-    delete: () => void;
+    delete: () => Promise<any>;
     challenges: {
         add: () => void;
         remove: () => void;
@@ -35,7 +36,7 @@ export const CTFContext = React.createContext<[ctfDataType, updateActionsType]>(
             add: async () => { },
             remove: async () => { },
         },
-        delete: () => { },
+        delete: async () => { },
         challenges: {
             add: () => { },
             remove: () => { },
@@ -49,6 +50,7 @@ export default function View() {
     const ctfName = params.ctf as string;
     const [ctfData, setCtfData] = useState<ctfDataType>({ members: [], challenges: [], description: "", start: "", end: "", name: "" });
     const [updating, setUpdating] = useState(false);
+    const [showSettings, setShowSettings] = useState(true);
 
     checkLoginNavigate();
 
@@ -110,7 +112,11 @@ export default function View() {
                 })
             },
         },
-        delete: () => { },
+        delete: () => {
+            return new Promise<void>((resolve, reject) => {
+                
+            })
+         },
         challenges: {
             add: () => { },
             remove: () => { },
@@ -120,7 +126,8 @@ export default function View() {
 
     return (
         <CTFContext.Provider value={[ctfData, updateActions]} >
-            <CTFInfo updating={updating} />
+            <Settings show={showSettings} destroy={() => setShowSettings(false)} />
+            <CTFInfo updating={updating} openSettings={() => setShowSettings(true)} />
             <MembersList />
         </CTFContext.Provider>
     );

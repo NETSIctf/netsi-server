@@ -9,8 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@types/react-datepicker": "^4.4.2",
-    "@types/react-router-dom": "^5.3.3",
     "@uiw/react-md-editor": "^3.19.0",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
@@ -26,7 +24,10 @@
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
+    "@types/react-bootstrap": "^0.32.32",
+    "@types/react-datepicker": "^4.4.2",
     "@types/react-dom": "^18.0.6",
+    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^2.0.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7"

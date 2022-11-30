@@ -4,7 +4,7 @@ import { RefreshCw, Settings } from "react-feather";
 import { CTFContext } from "./View";
 import { useContext } from "react";
 
-export default function CTFInfo({ updating }: { updating: boolean }) {
+export default function CTFInfo({ updating, openSettings }: { updating: boolean, openSettings: () => void }) {
     const params = useParams();
     const ctfName = params.ctf as string;
 
@@ -21,7 +21,7 @@ export default function CTFInfo({ updating }: { updating: boolean }) {
                 </div>
 
                 <div className="ms-auto" >
-                    <Button variant="outline-light"><Settings className="d-block" size="18" /></Button>
+                    <Button variant="outline-light" onClick={openSettings} ><Settings className="d-block" size="18" /></Button>
                 </div>
             </div>
 

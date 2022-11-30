@@ -1,5 +1,5 @@
 import { useContext, useState } from "react"
-import { MinusSquare, PlusSquare, RefreshCw, RotateCw } from "react-feather"
+import { MinusSquare, PlusSquare, RefreshCw } from "react-feather"
 import { getUsername } from "../../util";
 import { CTFContext } from "./View"
 
