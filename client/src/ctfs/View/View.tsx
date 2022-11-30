@@ -50,7 +50,7 @@ export default function View() {
     const ctfName = params.ctf as string;
     const [ctfData, setCtfData] = useState<ctfDataType>({ members: [], challenges: [], description: "", start: "", end: "", name: "" });
     const [updating, setUpdating] = useState(false);
-    const [showSettings, setShowSettings] = useState(true);
+    const [showSettings, setShowSettings] = useState(false);
 
     checkLoginNavigate();
 
@@ -114,7 +114,7 @@ export default function View() {
         },
         delete: () => {
             return new Promise<void>((resolve, reject) => {
-                
+
             })
          },
         challenges: {
