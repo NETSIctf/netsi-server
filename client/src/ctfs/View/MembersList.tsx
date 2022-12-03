@@ -23,6 +23,8 @@ export default function MembersList() {
             })
             .catch(err => {
                 setChanging(false);
+                alert("An error occurred while adding member.")
+                console.error(err);
             })
     }
 
@@ -35,6 +37,8 @@ export default function MembersList() {
             })
             .catch(err => {
                 setChanging(false);
+                alert("An error occurred while adding member.")
+                console.error(err);
             })
     }
 
@@ -43,11 +47,11 @@ export default function MembersList() {
             <div className="d-flex align-items-center border-bottom p-2" >
                 <h1 className="me-5" >Members</h1>
                 <h1>{added}</h1>
-                {!changing ?
-                    !added ?
-                        <PlusSquare className="text-success cursor-pointer" size="35" onClick={() => addMember()} /> : // User added or not
+                {changing ?
+                    <RefreshCw className="rotate-constant-3s" size="35" />
+                    : added ? // User added or not
                         <MinusSquare className="text-danger cursor-pointer" size="35" onClick={() => removeMember()} />
-                    : <RefreshCw className="rotate-constant-3s" size="35" />
+                        : <PlusSquare className="text-success cursor-pointer" size="35" onClick={() => addMember()} />
                 }
             </div>
             {members}
