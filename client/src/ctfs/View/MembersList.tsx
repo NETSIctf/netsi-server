@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import {useContext, useEffect, useState} from "react"
 import { MinusSquare, PlusSquare, RefreshCw } from "react-feather"
 import { getUsername } from "../../util";
 import { CTFContext } from "./View"
@@ -6,11 +6,13 @@ import { CTFContext } from "./View"
 export default function MembersList() {
     const [ctfData, setCtfData] = useContext(CTFContext);
     const [changing, setChanging] = useState(false);
-    const [added, setAdded] = useState(ctfData.members.includes(getUsername()));
+    const [added, setAdded] = useState(false);
 
-    console.log(ctfData.members.includes(getUsername()));
+    let members = ctfData.members.map((name) => <Member name={name} key={name} />);
 
-    var members = ctfData.members.map((name) => <Member name={name} key={name} />);
+    useEffect(() => {
+        setAdded(ctfData.members.includes(getUsername()));
+    }, [ctfData.members]);
 
     function addMember() {
         setChanging(true);
@@ -21,6 +23,8 @@ export default function MembersList() {
             })
             .catch(err => {
                 setChanging(false);
+                alert("An error occurred while adding member.")
+                console.error(err);
             })
     }
 
@@ -33,6 +37,8 @@ export default function MembersList() {
             })
             .catch(err => {
                 setChanging(false);
+                alert("An error occurred while adding member.")
+                console.error(err);
             })
     }
 
@@ -40,11 +46,12 @@ export default function MembersList() {
         <div className={`p-0 d-flex flex-column position-absolute top-50 end-0 translate-middle-y rounded-start border border-end-0 h-50`} id="membersList" >
             <div className="d-flex align-items-center border-bottom p-2" >
                 <h1 className="me-5" >Members</h1>
-                {!changing ?
-                    !added ?
-                        <PlusSquare className="text-success cursor-pointer" size="35" onClick={() => addMember()} /> : // User added or not
+                <h1>{added}</h1>
+                {changing ?
+                    <RefreshCw className="rotate-constant-3s" size="35" />
+                    : added ? // User added or not
                         <MinusSquare className="text-danger cursor-pointer" size="35" onClick={() => removeMember()} />
-                    : <RefreshCw className="rotate-constant-3s" size="35" />
+                        : <PlusSquare className="text-success cursor-pointer" size="35" onClick={() => addMember()} />
                 }
             </div>
             {members}
