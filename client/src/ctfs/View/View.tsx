@@ -8,6 +8,7 @@ import { getUsername } from "../../util";
 import MembersList from "./MembersList";
 import CTFInfo from "./CTFInfo";
 import Settings from "./Settings";
+import Challenges from "./Challenges";
 
 export type updateActionsType = {
     members: {
@@ -128,6 +129,7 @@ export default function View() {
         <CTFContext.Provider value={[ctfData, updateActions]} >
             <Settings show={showSettings} destroy={() => setShowSettings(false)} />
             <CTFInfo updating={updating} openSettings={() => setShowSettings(true)} />
+            <Challenges />
             <MembersList />
         </CTFContext.Provider>
     );
