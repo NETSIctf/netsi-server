@@ -1,7 +1,7 @@
-name: NodeJS with Webpack
+name: Pull request Testing
 
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 jobs:
@@ -32,19 +32,3 @@ jobs:
         yarn install
         yarn run build
         cd ..
-    
-    - name: Commit Files
-      run: |
-        git add *
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add -f client/dist
-        git add -f server/dist
-        git commit -a -m "Add Distribution files"
-
-    - name: Push Changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: deploy
-        force: true
