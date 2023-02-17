@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Terminal, { ColorMode, TerminalInput, TerminalOutput } from "react-terminal-ui";
+import { checkLoginNavigate } from "../components/LoginChecks";
 
 import io from "socket.io-client";
 
