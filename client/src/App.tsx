@@ -11,7 +11,7 @@ function App() {
         <h1> NETSI MAIN PAGE </h1>
       </header>
       <main className="mt-2" >
-        Fish is objectively bad.
+        Security Last!
       </main>
       <footer className="mt-2 d-flex flex-column" >
         <div>
