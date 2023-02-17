@@ -40,8 +40,6 @@ export default function Webshell() {
     }
 
     useEffect(() => { // SOCKET INIT CODE
-        checkLoginNavigate();
-
         socket.connect();
 
         appendTermData("Connecting to socket...")
