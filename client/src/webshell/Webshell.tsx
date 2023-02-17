@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Terminal, { ColorMode, TerminalInput, TerminalOutput } from "react-terminal-ui";
 
 import io from "socket.io-client";
+import { checkLoginNavigate } from "../components/LoginChecks";
 
 import "../scss/webshell.scss";
 
@@ -24,28 +25,14 @@ showheaders - true/false - Shows the header field or not.
 `
 
 export default function Webshell() {
+    checkLoginNavigate();
     const [termData, setTermData] = useState<(TerminalOutput | TerminalInput)[]>([]);
-
     const [options, setOptions_nomerge] = useState<monDataOptions>({ showHeaders: false });
 
-    function appendTermData(input: any, type: "output" | "input" = "output") {
-        if (type == "output") {
-            setTermData(prev => [...prev, <TerminalOutput key={prev.length}>{input}</TerminalOutput>]);
-        } else if (type == "input") {
-            setTermData(prev => [...prev, <TerminalInput key={prev.length}>{input}</TerminalInput>]);
-        }
-    }
-
-    function setOptions(options: Partial<monDataOptions>) {
-        setOptions_nomerge(prev => ({ ...prev, ...options }));
-    }
-
     useEffect(() => { // SOCKET INIT CODE
-        checkLoginNavigate();
-
         socket.connect();
 
-        appendTermData("Connecting to socket...")
+        appendTermData("Connecting to socket...");
 
         socket.on("connect", () => {
             appendTermData("Connected");
@@ -66,6 +53,7 @@ export default function Webshell() {
             setTermData([]);
         }
     }, []);
+
     useEffect(() => { // also socket stuff
         socket.on("monDataInit", (d: string) => {
             var data: monDataType[] = JSON.parse(d);
@@ -79,7 +67,7 @@ export default function Webshell() {
                 })
 
                 return [...prev, toAdd];
-            })
+            });
         });
 
         socket.on("monDataUpdate", (d: string) => {
@@ -92,7 +80,19 @@ export default function Webshell() {
             socket.off("monDataInit");
             socket.off("monDataUpdate");
         }
-    }, [options])
+    }, [options]);
+
+    function appendTermData(input: any, type: "output" | "input" = "output") {
+        if (type == "output") {
+            setTermData(prev => [...prev, <TerminalOutput key={prev.length}>{input}</TerminalOutput>]);
+        } else if (type == "input") {
+            setTermData(prev => [...prev, <TerminalInput key={prev.length}>{input}</TerminalInput>]);
+        }
+    }
+
+    function setOptions(options: Partial<monDataOptions>) {
+        setOptions_nomerge(prev => ({ ...prev, ...options }));
+    }
 
     function commands(text: string) {
         appendTermData(text, "input");

@@ -17,7 +17,7 @@ export type updateActionsType = {
     };
     delete: () => Promise<any>;
     challenges: {
-        add: () => void;
+        add: () => Promise<any>;
         remove: () => void;
         solve: () => void;
     }
@@ -39,7 +39,7 @@ export const CTFContext = React.createContext<[ctfDataType, updateActionsType]>(
         },
         delete: async () => { },
         challenges: {
-            add: () => { },
+            add: async () => { },
             remove: () => { },
             solve: () => { },
         }
@@ -117,9 +117,24 @@ export default function View() {
             return new Promise<void>((resolve, reject) => {
 
             })
-         },
+        },
         challenges: {
-            add: () => { },
+            add: (name: string, description: string, points: number) => {
+                return new Promise<boolean>((resolve, reject) => {
+                    setUpdating(true);
+                    axios.post("/api/ctfs/addChallenge", {
+                        title: ctfName,
+                        name: name,
+                        old_name: name,
+                        description: description,
+                        points: points
+                    })
+                        .then((resolve) => {
+                            if (resolve.status == 200) {
+                            }
+                        })
+                })
+            },
             remove: () => { },
             solve: () => { },
         }

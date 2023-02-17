@@ -45,13 +45,13 @@ export default function MembersList() {
     return (
         <div className={`p-0 d-flex flex-column position-absolute top-50 end-0 translate-middle-y rounded-start border border-end-0 h-50`} id="membersList" >
             <div className="d-flex align-items-center border-bottom p-2" >
-                <h1 className="me-5" >Members</h1>
+                <h1 className="me-3" >Members</h1>
                 <h1>{added}</h1>
                 {changing ?
-                    <RefreshCw className="rotate-constant-3s" size="35" />
+                    <RefreshCw className="rotate-constant-3s" size="40" />
                     : added ? // User added or not
-                        <MinusSquare className="text-danger cursor-pointer" size="35" onClick={() => removeMember()} />
-                        : <PlusSquare className="text-success cursor-pointer" size="35" onClick={() => addMember()} />
+                        <MinusSquare className="text-danger cursor-pointer" size="40" onClick={() => removeMember()} />
+                        : <PlusSquare className="text-success cursor-pointer" size="40" onClick={() => addMember()} />
                 }
             </div>
             {members}

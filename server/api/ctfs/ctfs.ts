@@ -109,6 +109,7 @@ export default function ctf() {
     })
 
     router.post("/addChallenge", (req, res) => {
+        console.log("/addChallenge");
         if (req.check_auth()) {
             let ctfName = req.body.title as string;
             db.get("SELECT id FROM ctfs WHERE name = ?", [ctfName], (err, row) => {
