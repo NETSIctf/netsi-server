@@ -21,7 +21,7 @@
     "react-router-dom": "^6.3.0",
     "react-terminal-ui": "^1.0.0",
     "sass": "^1.54.8",
-    "socket.io-client": "^4.5.2"
+    "socket.io-client": "^4.6.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
