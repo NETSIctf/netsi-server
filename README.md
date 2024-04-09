@@ -1,9 +1,7 @@
 ﻿# netsi-server
 server client site & api stuff
 
-hosted at [netsi.tk](https://netsi.tk)
-
-on [Google Cloud Platform](https://cloud.google.com/)'s e2-micro
+designed to run on [Google Cloud Platform](https://cloud.google.com/)'s e2-micro
 
 deployment systems powered by [git-repo-watcher](https://github.com/kolbasa/git-repo-watcher) and some cron jobs and bad python and shell scripts
 
