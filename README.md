@@ -1,5 +1,5 @@
 ﻿# netsi-server
-server client site & api stuff
+Versatile CTF Planning tool and Web Dev/Pentest Multitool
 
 designed to run on [Google Cloud Platform](https://cloud.google.com/)'s e2-micro
 
