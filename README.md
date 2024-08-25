@@ -1,7 +1,7 @@
 ﻿# netsi-server
 Versatile CTF Planning tool and Web Dev/Pentest Multitool
 
-designed to run on [Google Cloud Platform](https://cloud.google.com/)'s e2-micro
+designed to run on anything that supports node.
 
 deployment systems now powered by an in house [deployment-engine](https://github.com/NETSIctf/deployment-engine) daemon
 
